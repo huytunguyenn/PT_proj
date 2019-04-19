@@ -4,11 +4,15 @@
 //
 
 #pragma once
-
+#define _CRT_SECURE_NO_WARNINGS
 #include "targetver.h"
 
 #include <stdio.h>
 #include <tchar.h>
+#include "iostream"
+#include "string.h"
+#include <windows.h>
+#include <conio.h>
 
 struct Account
 {
@@ -22,7 +26,7 @@ struct Date  // format: DD/MM/YY
 	int Month{ 0 };
 	int Year{ 0 };
 };
-typedef Date DATE;
+
 struct User
 {
 	ACCOUNT Acc;
@@ -34,5 +38,11 @@ struct User
 	bool Condition{ 0 }; // 0 is block, 1 is activated	
 };
 typedef User USER;
+struct Database // using linked list
+{
+	USER data;
+	USER *pNext;
+};
+typedef Database DATABASE;
 
 // TODO: reference additional headers your program requires here
