@@ -2,28 +2,36 @@
 //
 
 #include "stdafx.h"
-#define MAX_PASS 25 
-//biến toàn cục
-char passAdmin[20] = { "admin" };
-char passQuanLy[20] = { "quanly" };
-char passChuyenVien[20] = { "chuyenvien" };
+
+//prototype
+void menu();
+void gotoxy(int x, int y);
+void MenuAdmin();
+void Login(int &luachon);
+void RePassAdmin();
 
 
-void ChangePass()
+void RePassAdmin()
 {
+	// lấy lại username
+	char userAdmin[MAX_USERNAME];
+	FILE *fAcc = fopen("Admin.txt", "rt"); 
+	rewind(fAcc);
+	fscanf(fAcc, "%s", userAdmin);
+	fclose(fAcc);
+	// ghi lại toàn bộ file Admin
+	FILE *fAcc2 = fopen("Admin.txt", "wt");
+	char newPass[MAX_PASS];
+	printf("Mat khau moi: ");
+	scanf("%s", &newPass);
+	rewind(fAcc);
+	fprintf(fAcc, userAdmin);
+	fprintf(fAcc, "\n");
+	fprintf(fAcc, newPass);
+	fclose(fAcc);
 }
-void UpadateInfo()
-{
-}
-void CreateUser(/*DATABASE &data, USER *p*/)
-{
-	/*if (strcmp(it.Acc.sUsername, user.Acc.sUsername) == 0)*/
 
-}
-void Authority()
-{
 
-}
 // dùng để trang trí, chạy hiệu ứng
 void gotoxy(int x, int y)
 {
@@ -33,16 +41,121 @@ void gotoxy(int x, int y)
 	COORD c = { x, y };
 	SetConsoleCursorPosition(h, c);
 }
+void MenuAdmin()
+{
+	int luachon;
+	system("cls");
+	gotoxy(20, 3);
+	printf("\xB2\xB2\xB2\xB2\xB2\xB2 HE THONG QUAN LY THU VIEN - ADMIN \xB2\xB2\xB2\xB2\xB2\xB2");
+	gotoxy(20, 5);
+	printf("\xB2\xB2\t 1. Dang xuat");
+	gotoxy(20, 7);
+	printf("\xB2\xB2\t 2. Thay doi mat khau");
+	gotoxy(20, 9);
+	printf("\xB2\xB2\t 3. Cap nhat thong tin ca nhan");
+	gotoxy(20, 11);
+	printf("\xB2\xB2\t 4. Tao tai khoan moi");
+	gotoxy(20, 13);
+	printf("\xB2\xB2\t 5. Phan quyen (quan ly hoac nhan vien)");
+	gotoxy(20, 15);
+	printf("\xB2\xB2\t 6. Quan ly doc gia");
+	gotoxy(20, 17);
+	printf("\xB2\xB2\t 7. Quan ly sach");
+	gotoxy(20, 19);
+	printf("\xB2\xB2\t 8. Lap phieu muon sach");
+	gotoxy(20, 21);
+	printf("\xB2\xB2\t 9. Lap phieu tra sach");
+	gotoxy(20, 23);
+	printf("\xB2\xB2\t 10. Thong ke");
+	gotoxy(20, 25);
+	printf("\xB2\xB2\t 11. Thoat chuong trinh");
+	gotoxy(20, 27);
+	printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
 
+
+	gotoxy(20, 29);
+	printf("Lua chon cua ban:");
+	scanf("%d", &luachon);
+	switch (luachon)
+	{
+	case 1:
+		menu();
+		break;
+	case 2:
+		RePassAdmin();
+		MenuAdmin();
+		break;
+	case 3:
+
+		break;
+	case 4:
+		
+		break;
+	case 5:
+
+		break;
+	case 6:
+
+		break;
+	case 7:
+
+		break;
+	case 8:
+
+		break;
+	case 9:
+
+		break;
+	case 10:
+
+		break;
+	case 11:
+	{
+		system("cls");
+		gotoxy(20, 11); printf("Thoat trong 3 giay nua");
+		for (int j = 0; j < 60; j++)
+		{
+			Sleep(50);
+			printf(".");
+		}
+		system("cls");
+		exit(0);
+	}
+	default:
+	{
+		gotoxy(20, 31);
+		printf("\aChon sai, vui long chon lai!");
+		if (_getch())
+			MenuAdmin();
+	}
+	}
+}
 void Login(int &luachon)
 {
+	char userAdmin[MAX_USERNAME];
+	char passAdmin[MAX_PASS];
+	FILE *fAcc = fopen("Admin.txt", "rt"); // Admin.txt lưu trữ username và pass của admin
+	if (fAcc == NULL)
+	{
+		fAcc = fopen("Admin.txt", "wt"); // tập tin sẽ được tạo nếu chưa có
+		if (fAcc == NULL)
+		{
+			printf("Khong mo duoc tap tin"); system("pause");
+		}
+	}
+	rewind(fAcc);
+	fscanf(fAcc, "%s", userAdmin);
+	fseek(fAcc, strlen(userAdmin), SEEK_SET);
+	fscanf(fAcc, "%s", passAdmin);
+	fclose(fAcc);
 	system("cls");
-	char ch, pass[MAX_PASS];
-	gotoxy(10, 4); printf("Ten dang nhap: ");
-	//ch = _getch();
-	gotoxy(10, 5); printf("Password:\n");
+	char pass[MAX_PASS];
+	char username[MAX_USERNAME];
+	gotoxy(20, 4); printf("Username: ");
+	scanf("%s", &username);
+	gotoxy(20, 6); printf("Password: ");
 	// mã hóa mật khẩu
-	gotoxy(19, 5);
+	gotoxy(29, 6);
 	int p = 0;
 	do {
 		pass[p] = _getch();
@@ -53,18 +166,20 @@ void Login(int &luachon)
 		p++;
 	} while (pass[p - 1] != '\r');
 	pass[p - 1] = '\0';
-	if (strcmp(pass, passAdmin) == 0)
+	if (strcmp(username, userAdmin) == 0 && strcmp(pass, passAdmin) == 0)
 	{
-		gotoxy(15, 9); printf("Ban da dang nhap duoi quyen admin.\n");
+		gotoxy(20, 9); printf("Ban da dang nhap duoi quyen Admin.\n");
+		_getch();
+		MenuAdmin();
 	}
-	else if (strcmp(pass, passChuyenVien) == 0)
+	/*else if ()
 	{
 		gotoxy(15, 9); printf("Ban da dang nhap duoi quyen chuyen vien.\n");
 	}
-	else if (strcmp(pass, passQuanLy) == 0)
+	else if ()
 	{
 		gotoxy(15, 9); printf("Ban da dang nhap duoi quyen quan ly.\n");
-	}
+	}*/
 	else
 	{
 		gotoxy(8, 8); printf("\aDang nhap khong thanh cong!");
@@ -96,8 +211,8 @@ void Login(int &luachon)
 		}
 	}
 }
-
-void menu() //đăng nhập
+//menu đăng nhập
+void menu() 
 {
 	int luachon = 0; // nếu người dùng muốn quay lại: 1=có,0=ko
 	char d[26] = "He Thong Quan Ly Thu Vien";
@@ -150,231 +265,10 @@ void menu() //đăng nhập
 	} while (luachon == 1);
 }
 
-//void MainMenuQuanLy()
-//{
-//
-//	system("cls");
-//	int i;
-//	gotoxy(20, 3);
-//	printf("\xB2\xB2\xB2\xB2\xB2\xB2 HE THONG QUAN LY THU VIEN \xB2\xB2\xB2\xB2\xB2\xB2");
-//	gotoxy(20, 5);
-//	printf("\xB2\xB2\xB2\ 1. Dang nhap   ");
-//	gotoxy(20, 7);
-//	printf("\xB2\xB2\xB2\ 2. Dang xuat   ");
-//	gotoxy(20, 9);
-//	printf("\xB2\xB2\xB2\ 3. Thay doi mat khau");
-//	gotoxy(20, 11);
-//	printf("\xB2\xB2\xB2\ 4. Cap nhat thong tin ca nhan");
-//	gotoxy(20, 13);
-//	printf("\xB2\xB2\xB2\ 5. View Books List");
-//	gotoxy(20, 15);
-//	printf("\xB2\xB2\xB2\ 6. Edit Book's Record");
-//	gotoxy(20, 17);
-//	printf("\xB2\xB2\xB2\ 7. Close Application");
-//	gotoxy(20, 19);
-//	printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
-//	gotoxy(20, 20);
-//
-//	gotoxy(20, 21);
-//	printf("Lua chon cua ban:");
-//	switch (_getch())
-//	{
-//	case '1':
-//		login();
-//		break;
-//	case '2':
-//		logout();
-//		break;
-//	case '3':
-//
-//		break;
-//	case '4':
-//
-//		break;
-//	case '5':
-//
-//		break;
-//	case '6':
-//
-//		break;
-//	case '7':
-//	{
-//		system("cls");
-//		gotoxy(16, 3);
-//		printf("\tHe thong quan ly thu vien");
-//		gotoxy(16, 7);
-//		printf("\tDo an Ky Thuat Lap Trinh");
-//		gotoxy(16, 9);
-//		printf("\t18120254 - 18120267");
-//		gotoxy(16, 11);
-//		printf("\t::::::::::::::::::::::::::::");
-//		gotoxy(16, 13);
-//		printf("\t::::::::::::::::::::::::::::");
-//		gotoxy(16, 15);
-//		printf("Thoat trong 3 giay nua...........>");
-//		Sleep(3000); // sleep three seconds
-//		system("cls");
-//		exit(0);
-//	}
-//	default:
-//	{
-//		gotoxy(10, 23);
-//		printf("\aChon sai, vui long chon lai!");
-//		if (_getch())
-//			MainMenuQuanLy();
-//	}
-//	}
-//}
-//void MainMenuChuyenVien()
-//{
-//
-//	system("cls");
-//	int i;
-//	gotoxy(20, 3);
-//	printf("\xB2\xB2\xB2\xB2\xB2\xB2 HE THONG QUAN LY THU VIEN \xB2\xB2\xB2\xB2\xB2\xB2");
-//	gotoxy(20, 5);
-//	printf("\xB2\xB2\xB2\ 1. Dang nhap   ");
-//	gotoxy(20, 7);
-//	printf("\xB2\xB2\xB2\ 2. Dang xuat   ");
-//	gotoxy(20, 9);
-//	printf("\xB2\xB2\xB2\ 3. Thay doi mat khau");
-//	gotoxy(20, 11);
-//	printf("\xB2\xB2\xB2\ 4. Cap nhat thong tin ca nhan");
-//	gotoxy(20, 13);
-//	printf("\xB2\xB2\xB2\ 5. View Books List");
-//	gotoxy(20, 15);
-//	printf("\xB2\xB2\xB2\ 6. Edit Book's Record");
-//	gotoxy(20, 17);
-//	printf("\xB2\xB2\xB2\ 7. Close Application");
-//	gotoxy(20, 19);
-//	printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
-//	gotoxy(20, 20);
-//
-//	gotoxy(20, 21);
-//	printf("Lua chon cua ban:");
-//	switch (_getch())
-//	{
-//	case '1':
-//		login();
-//		break;
-//	case '2':
-//		logout();
-//		break;
-//	case '3':
-//
-//		break;
-//	case '4':
-//
-//		break;
-//	case '5':
-//
-//		break;
-//	case '6':
-//
-//		break;
-//	case '7':
-//	{
-//		system("cls");
-//		gotoxy(16, 3);
-//		printf("\tHe thong quan ly thu vien");
-//		gotoxy(16, 7);
-//		printf("\tDo an Ky Thuat Lap Trinh");
-//		gotoxy(16, 9);
-//		printf("\t18120254 - 18120267");
-//		gotoxy(16, 11);
-//		printf("\t::::::::::::::::::::::::::::");
-//		gotoxy(16, 13);
-//		printf("\t::::::::::::::::::::::::::::");
-//		gotoxy(16, 15);
-//		printf("Thoat trong 3 giay nua...........>");
-//		Sleep(3000); // sleep three seconds
-//		system("cls");
-//		exit(0);
-//	}
-//	default:
-//	{
-//		gotoxy(10, 23);
-//		printf("\aChon sai, vui long chon lai!");
-//		if (_getch())
-//			MainMenuChuyenVien();
-//	}
-//	}
-//}
-
-//void MenuAdmin()
-//{
-//
-//	system("cls");
-//	int i;
-//	gotoxy(20, 3);
-//	printf("\xB2\xB2\xB2\xB2\xB2\xB2 HE THONG QUAN LY THU VIEN \xB2\xB2\xB2\xB2\xB2\xB2");
-//	gotoxy(20, 5);
-//	printf("\xB2\xB2\xB2\ 1. Dang xuat   ");
-//	gotoxy(20, 7);
-//	printf("\xB2\xB2\xB2\ 2. Thay doi mat khau   ");
-//	gotoxy(20, 9);
-//	printf("\xB2\xB2\xB2\ 3. ");
-//	gotoxy(20, 11);
-//	printf("\xB2\xB2\xB2\ 4. Cap nhat thong tin ca nhan");
-//	gotoxy(20, 13);
-//	printf("\xB2\xB2\xB2\ 5. View Books List");
-//	gotoxy(20, 15);
-//	printf("\xB2\xB2\xB2\ 6. Edit Book's Record");
-//	gotoxy(20, 17);
-//	printf("\xB2\xB2\xB2\ 7. Thoat chuong trinh");
-//	gotoxy(20, 19);
-//	printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
-//	gotoxy(20, 20);
-//
-//	gotoxy(20, 21);
-//	printf("Lua chon cua ban:");
-//	switch (_getch())
-//	{
-//	case '1':
-//
-//		break;
-//	case '2':
-//
-//		break;
-//	case '3':
-//
-//		break;
-//	case '4':
-//
-//		break;
-//	case '5':
-//
-//		break;
-//	case '6':
-//
-//		break;
-//	case '7':
-//	{
-//		system("cls");
-//		printf("Thoat trong 3 giay nua");
-//		for (int j = 0; j < 20; j++)
-//		{
-//			Sleep(50);
-//			printf(".");
-//		}
-//		Sleep(3000); // sleep three seconds
-//		system("cls");
-//		exit(0);
-//	}
-//	default:
-//	{
-//		gotoxy(10, 23);
-//		printf("\aChon sai, vui long chon lai!");
-//		if (_getch())
-//			MenuAdmin();
-//	}
-//	}
-//}
-
 
 int main()
 {
-	//system("color F0");
+	system("color F0");
 	menu();
 	_getch();
 	return 0;
