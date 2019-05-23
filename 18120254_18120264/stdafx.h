@@ -10,14 +10,14 @@
 #include <windows.h>
 #include <conio.h>
 
-// độ dài tối đa
-#define MAX_PASS 25 
+// DEFINE 
+#define MAX_PASS 25		 // độ dài tối đa
 #define MAX_USERNAME 25 
 #define MAX_NAME 64 
-#define THIS_YEAR 2019 // năm hiện tại để check date
+#define THIS_YEAR 2019  // năm hiện tại để check date
 #define LIMIT_YEAR 1900
-
-struct Date  // format: DD/MM/YY
+// STRUCT
+struct Date  // format: D/M/Y
 {
 	int Day;
 	int Month;
@@ -65,7 +65,34 @@ struct Book
 	int Quantity;
 };
 typedef Book BOOK;
-
-
+// PROTOTYPE
 void gotoxy(int x, int y);
+// kiểm tra ngày hợp lệ
+int CheckDate(DATES BirthDate);
+// xuất thông tin 1 tài khoản
+void OutputInfo(ACCOUNT login);
+// thay đổi mật khẩu
+void RePass(ACCOUNT &login);
+// cập nhật thông tin cá nhân 
+void UpdateInfo(ACCOUNT &login);
+// nhập thông tin 1 tài khoản
+void InputInfo(ACCOUNT &acc);
+//kiểm tra tài khoản đã tồn tại, return true neu co ton tai
+int ExistAcc(FILE *f, ACCOUNT acc);
+// thêm tài khoản
+void CreateAcc();
+// kiểm tra tài khoản đăng nhập  
+void CheckLogin(FILE *f, char username[MAX_PASS], char pass[MAX_USERNAME], ACCOUNT &login, int &checkacc);
+// phân quyền tài khoản
+void PhanQuyen();
+//menu đăng nhập
+void menu();
+// đăng nhập
+void Login(int &luachon);
+//menu admin
+void MenuAdmin(ACCOUNT &login);
+// menu chuyên viên
+void MenuChuyenVien(ACCOUNT &login);
+// menu quản lý
+void MenuQuanLy(ACCOUNT &login);
 #endif
