@@ -10,14 +10,32 @@
 #include <windows.h>
 #include <conio.h>
 
+
 // DEFINE 
 #define MAX_PASS 25		 // độ dài tối đa
 #define MAX_USERNAME 25 
+#define MAX_PRICE 9
 #define MAX_NAME 64 
 #define THIS_YEAR 2019  // năm hiện tại để check date
 #define LIMIT_YEAR 1900
+
+
 // STRUCT
-struct Date  // format: D/M/Y
+// dslk dùng để thống kê sách theo thể loại
+struct NodeName {
+	char data[MAX_NAME];  
+	int num; // số lượng sách của thể loại đó
+	struct NodeName *pNext;
+};
+typedef struct NodeName NODE_NAME;
+
+struct ListName {
+	struct NodeName *pHead;
+	struct NodeName *pTail;
+};
+typedef struct ListName LIST_NAME;
+// format: D/M/Y
+struct Date  
 {
 	int Day;
 	int Month;
@@ -41,9 +59,9 @@ typedef Account ACCOUNT;
 // thông tin thẻ độc giả
 struct User
 {
-	char ID[15];
+	char ID[MAX_PASS];
 	char FullName[MAX_NAME];
-	char CMND[15];
+	char CMND[MAX_PASS];
 	DATES BirthDate;
 	bool Genre; // 0 is female, 1 is male	
 	char Email[MAX_NAME];
@@ -55,16 +73,19 @@ typedef User USER;
 // thông tin sách
 struct Book
 {
-	char ISBN;
+	char ISBN[MAX_PASS];
 	char Name[MAX_NAME];
 	char Author[MAX_NAME];
 	char Publisher[MAX_NAME];
 	DATES Issued;
-	char Catagories[MAX_NAME];
-	char Price;
+	char Categories[MAX_NAME];
+	char Price[MAX_PRICE];
 	int Quantity;
+	int Borrow; // số sách đang được mượn
 };
 typedef Book BOOK;
+
+
 // PROTOTYPE
 void gotoxy(int x, int y);
 // kiểm tra ngày hợp lệ
@@ -77,14 +98,34 @@ void RePass(ACCOUNT &login);
 void UpdateInfo(ACCOUNT &login);
 // nhập thông tin 1 tài khoản
 void InputInfo(ACCOUNT &acc);
-//kiểm tra tài khoản đã tồn tại, return true neu co ton tai
-int ExistAcc(FILE *f, ACCOUNT acc);
+//kiểm tra tài khoản đã tồn tại, return true nếu có tồn tại
+bool ExistAcc(FILE *f, ACCOUNT acc);
 // thêm tài khoản
 void CreateAcc();
 // kiểm tra tài khoản đăng nhập  
 void CheckLogin(FILE *f, char username[MAX_PASS], char pass[MAX_USERNAME], ACCOUNT &login, int &checkacc);
 // phân quyền tài khoản
 void PhanQuyen();
+
+
+// xem sách
+void ViewBook();
+// thêm sách
+void InputBook(BOOK &book);
+bool ExistBook(FILE *f, BOOK book);
+void AddBook();
+// số lượng loại sách
+void KhoiTaoName(LIST_NAME &l);
+NODE_NAME* TaoNodeName(char x[MAX_NAME], int quantity);
+NODE_NAME* ThemDuoiName(LIST_NAME &l, NODE_NAME *p);
+void CheckExistName(LIST_NAME &l, char name[MAX_NAME], int &check, int quantity);
+void ViewBookCategory();
+
+
+// menu quản lý sách
+void MenuSach(ACCOUNT login);
+// menu thống kê
+void MenuThongKe(ACCOUNT login);
 //menu đăng nhập
 void menu();
 // đăng nhập
