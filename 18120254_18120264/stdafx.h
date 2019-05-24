@@ -34,6 +34,7 @@ struct ListName {
 	struct NodeName *pTail;
 };
 typedef struct ListName LIST_NAME;
+
 // format: D/M/Y
 struct Date  
 {
@@ -106,6 +107,8 @@ void CreateAcc();
 void CheckLogin(FILE *f, char username[MAX_PASS], char pass[MAX_USERNAME], ACCOUNT &login, int &checkacc);
 // phân quyền tài khoản
 void PhanQuyen();
+// xem tài khoản
+void ViewAcc();
 
 
 // xem sách
@@ -120,6 +123,16 @@ NODE_NAME* TaoNodeName(char x[MAX_NAME], int quantity);
 NODE_NAME* ThemDuoiName(LIST_NAME &l, NODE_NAME *p);
 void CheckExistName(LIST_NAME &l, char name[MAX_NAME], int &check, int quantity);
 void ViewBookCategory();
+// Chỉnh sửa thông tin 1 quyển sách
+void UpdateBook();
+// xuất thông tin 1 quyển sách
+void OutputBook(BOOK book);
+//Tìm kiếm sách theo ISBN
+void SearchBookISBN();
+//Tìm kiếm sách theo tên sách
+void SearchBookName();
+//Xóa thông tin sách theo ISBN
+void DeleteBook();
 
 
 // menu quản lý sách
