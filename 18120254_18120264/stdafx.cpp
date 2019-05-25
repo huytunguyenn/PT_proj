@@ -1455,45 +1455,48 @@ void MenuAdmin(ACCOUNT &login)
 		case 2:
 		{
 			system("cls");
-			char passtemp[MAX_PASS];
-			do {
-				// nhập pass 
-				gotoxy(20, 8); printf("Nhap lai Password: ");
-				// mã hóa mật khẩu
-				gotoxy(39, 8);
-				int p = 0;
-				do {
-					passtemp[p] = _getch();
-					if (passtemp[p] != '\r')
-					{
-						printf("*");
-					}
-					p++;
-				} while (passtemp[p - 1] != '\r');
-				passtemp[p - 1] = '\0';
-				if (strcmp(passtemp, login.Password) == 0)
-				{
-					system("cls");
-					RePass(login);
-				}
-				else if (strcmp(passtemp, login.Password) != 0)
-				{
-					gotoxy(20, 10); printf("Ban da nhap sai Password");
-					int choice;
-					do {
-						gotoxy(20, 12); printf("Thoat ra menu?");
-						gotoxy(23, 14); printf("1. Co");
-						gotoxy(23, 16); printf("2. Khong, nhap lai.");
-						gotoxy(20, 18); printf("Lua chon cua ban: ");
-						scanf("%d", &choice);
-						if (choice != 1 && choice != 2)
-							gotoxy(20, 20); printf("Vui long chi nhap 1 hoac 2 ");
-					} while (choice != 1 && choice != 2);
-					if (choice == 1)
-						break;
-					system("cls");
-				}
-			} while (strcmp(passtemp, login.Password) != 0);
+			//char passtemp[MAX_PASS];
+			//do {
+			//	// nhập pass 
+			//	gotoxy(20, 8); printf("Nhap lai Password: ");
+			//	// mã hóa mật khẩu
+			//	gotoxy(39, 8);
+			//	int p = 0;
+			//	do {
+			//		passtemp[p] = _getch();
+			//		if (passtemp[p] != '\r')
+			//		{
+			//			printf("*");
+			//		}
+			//		p++;
+			//	} while (passtemp[p - 1] != '\r');
+			//	passtemp[p - 1] = '\0';
+			//	if (strcmp(passtemp, login.Password) == 0)
+			//	{
+			//		system("cls");
+			//		RePass(login);
+			//	}
+			//	else if (strcmp(passtemp, login.Password) != 0)
+			//	{
+			//		gotoxy(20, 10); printf("Ban da nhap sai Password");
+			//		int choice;
+			//		do {
+			//			gotoxy(20, 12); printf("Thoat ra menu?");
+			//			gotoxy(23, 14); printf("1. Co");
+			//			gotoxy(23, 16); printf("2. Khong, nhap lai.");
+			//			gotoxy(20, 18); printf("Lua chon cua ban: ");
+			//			scanf("%d", &choice);
+			//			if (choice != 1 && choice != 2)
+			//				gotoxy(20, 20); printf("Vui long chi nhap 1 hoac 2 ");
+			//		} while (choice != 1 && choice != 2);
+			//		if (choice == 1)
+			//			break;
+			//		system("cls");
+			//	}
+			//} while (strcmp(passtemp, login.Password) != 0);
+			system("cls");
+			RePass(login);
+
 			break;
 		}
 		case 3:
@@ -1614,6 +1617,7 @@ void MenuChuyenVien(ACCOUNT &login)
 		{
 			system("cls");
 			char passtemp[MAX_PASS];
+			bool check = false;
 			do {
 				// nhập pass 
 				gotoxy(20, 8); printf("Nhap lai Password: ");
@@ -1631,10 +1635,11 @@ void MenuChuyenVien(ACCOUNT &login)
 				passtemp[p - 1] = '\0';
 				if (strcmp(passtemp, login.Password) == 0)
 				{
+					check = true;
 					system("cls");
 					RePass(login);
 				}
-				else if (strcmp(passtemp, login.Password) != 0)
+				else 
 				{
 					gotoxy(20, 10); printf("Ban da nhap sai Password");
 					int choice;
@@ -1651,7 +1656,7 @@ void MenuChuyenVien(ACCOUNT &login)
 						break;
 					system("cls");
 				}
-			} while (strcmp(passtemp, login.Password) != 0);
+			} while (check==false);
 			break;
 		}
 		case 3:
