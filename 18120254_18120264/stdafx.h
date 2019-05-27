@@ -16,14 +16,14 @@
 #define MAX_USERNAME 25 
 #define MAX_PRICE 9
 #define MAX_NAME 64 
-#define THIS_YEAR 2019  // năm hiện tại để check date
+#define THIS_YEAR 2020  // năm hiện tại để check date
 #define LIMIT_YEAR 1900
 
 
 // STRUCT
 // dslk dùng để thống kê sách theo thể loại
 struct NodeName {
-	char data[MAX_NAME];  
+	char data[MAX_NAME];
 	int num; // số lượng sách của thể loại đó
 	struct NodeName *pNext;
 };
@@ -36,7 +36,7 @@ struct ListName {
 typedef struct ListName LIST_NAME;
 
 // format: D/M/Y
-struct Date  
+struct Date
 {
 	int Day;
 	int Month;
@@ -58,19 +58,19 @@ struct Account
 };
 typedef Account ACCOUNT;
 // thông tin thẻ độc giả
-struct User
+struct Reader
 {
 	char ID[MAX_PASS];
 	char FullName[MAX_NAME];
 	char CMND[MAX_PASS];
 	DATES BirthDate;
-	bool Genre; // 0 is female, 1 is male	
+	int Genre;					// 1:Nam, 2:Nu
 	char Email[MAX_NAME];
 	char Address[MAX_NAME];
 	DATES BornCard;
 	DATES EndCard; // 48 months since born
 };
-typedef User USER;
+typedef Reader READER;
 // thông tin sách
 struct Book
 {
@@ -80,12 +80,39 @@ struct Book
 	char Publisher[MAX_NAME];
 	DATES Issued;
 	char Categories[MAX_NAME];
-	char Price[MAX_PRICE];
+	int Price;
 	int Quantity;
 	int Borrow; // số sách đang được mượn
 };
 typedef Book BOOK;
-
+struct phieumuonsach
+{
+	char ID[MAX_PASS];
+	DATES Borrow;
+	DATES Return;
+	char ISBN1[MAX_PASS];
+	char ISBN2[MAX_PASS];
+	char ISBN3[MAX_PASS];
+	int SL;
+};
+typedef struct phieumuonsach PMS;
+struct phieumuontrasach
+{
+	char ID[MAX_PASS];
+	DATES Borrow;
+	DATES Return;
+	char ISBN1[MAX_PASS];
+	char ISBN2[MAX_PASS];
+	char ISBN3[MAX_PASS];
+	int SL;
+	int SLMat;
+	DATES ReturnReal;
+	char Lost1[MAX_PASS];
+	char Lost2[MAX_PASS];
+	char Lost3[MAX_PASS];
+	int Bill;
+};
+typedef struct phieumuontrasach PTS;
 
 // PROTOTYPE
 void gotoxy(int x, int y);
@@ -117,12 +144,6 @@ void ViewBook();
 void InputBook(BOOK &book);
 bool ExistBook(FILE *f, BOOK book);
 void AddBook();
-// số lượng loại sách
-void KhoiTaoName(LIST_NAME &l);
-NODE_NAME* TaoNodeName(char x[MAX_NAME], int quantity);
-NODE_NAME* ThemDuoiName(LIST_NAME &l, NODE_NAME *p);
-void CheckExistName(LIST_NAME &l, char name[MAX_NAME], int &check, int quantity);
-void ViewBookCategory();
 // Chỉnh sửa thông tin 1 quyển sách
 void UpdateBook();
 // xuất thông tin 1 quyển sách
@@ -133,12 +154,71 @@ void SearchBookISBN();
 void SearchBookName();
 //Xóa thông tin sách theo ISBN
 void DeleteBook();
-
-
 // menu quản lý sách
 void MenuSach(ACCOUNT login);
+
+
+// thêm độc giả
+void InputReader(READER &reader);
+bool ExistReader(FILE *f, READER reader);
+void AddReader();
+// xem độc giả
+void ViewReader();
+// Chỉnh sửa thông tin 1 độc giả
+void UpdateReader();
+// xuất thông tin 1 độc giả
+void OutputReader(READER reader);
+//Tìm kiếm độc giả theo CMND
+void SearchReaderCMND();
+//Tìm kiếm độc giả theo họ tên
+void SearchReaderName();
+//Xóa thông tin độc giả theo ID
+void DeleteReader();
+// menu quản lý độc giả
+void MenuDocGia(ACCOUNT login);
+
+
+// kiểm tra ID độc giả tồn tại ko
+bool ExistIDReader(char ID[MAX_PASS]);
+// kiểm tra ISBN sách tồn tại ko
+bool ExistISBNBook(char ISBN[MAX_PASS]);
+// thêm 7 ngày -> ngày trả
+void Add7Day(DATES &Return);
+// tăng borrow của sách theo ISBN + check nếu borrow>quantity 
+bool IncreaseBorrow(char ISBN[MAX_PASS]);
+// xuất ra phiếu mượn sách
+void OutputPhieuMuonSach(PMS &Phieu);
+// nhập và ghi phiếu mượn sách
+void InputPhieuMuonSach();
+
+// số ngày trễ hạn
+int DayLate(PTS Phieu);
+// tìm giá của sách
+int SearchPrice(char ISBN[MAX_PASS]);
+// tiền trễ hạn
+int Bill(PTS &Phieu);
+// kiểm tra ID độc giả tồn tại trong PhieuMuon.bin ko rồi copy ra PTS
+bool ExistIDBorrow(char ID[MAX_PASS], PTS &Phieu);
+void OutputPhieuTraSach(PTS Phieu);
+void InputPhieuTraSach();
+
+
+// thống kê loại sách
+void KhoiTaoName(LIST_NAME &l);
+NODE_NAME* TaoNodeName(char x[MAX_NAME], int quantity);
+NODE_NAME* ThemDuoiName(LIST_NAME &l, NODE_NAME *p);
+void CheckExistName(LIST_NAME &l, char name[MAX_NAME], int &check, int quantity);
+void ViewBookCategory();
+// thống kê số lượng sách đang được mượn
+void ViewBorrow();
+// thống kê độc giả theo giới tính
+void ViewReaderGenre();
+// thống kê đôc giả trễ hạn
+void ViewTreHanReader();
 // menu thống kê
 void MenuThongKe(ACCOUNT login);
+
+
 //menu đăng nhập
 void menu();
 // đăng nhập

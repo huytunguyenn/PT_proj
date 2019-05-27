@@ -1,5 +1,4 @@
 ﻿#include "stdafx.h"
-
 // di chuyển đến vị trí (x,y)
 void gotoxy(int x, int y)
 {
@@ -13,7 +12,7 @@ void gotoxy(int x, int y)
 int CheckDate(DATES BirthDate)
 {
 	int MaxDay; // ngày trong tháng
-	if (BirthDate.Year <= LIMIT_YEAR || BirthDate.Year >= THIS_YEAR || BirthDate.Month < 0 || BirthDate.Month > 12 || BirthDate.Day < 0 || BirthDate.Day > 31)
+	if (BirthDate.Year <= LIMIT_YEAR || BirthDate.Year > THIS_YEAR || BirthDate.Month < 0 || BirthDate.Month > 12 || BirthDate.Day < 0 || BirthDate.Day > 31)
 	{
 		return 1;
 	}
@@ -120,9 +119,8 @@ void RePass(ACCOUNT &login)
 			// đi đến vị trí info để ghi
 			fseek(fAcc, ftell(fAcc) - sizeof(ACCOUNT), 0);
 			fwrite(&login, sizeof(ACCOUNT), 1, fAcc);
-			fclose(fAcc);	 // quan trọng: không được để ngoài vòng if
+			fclose(fAcc); // quan trọng: không được để ngoài vòng if
 			gotoxy(20, 10); printf("Cap nhat password thanh cong.  ");
-			system("pause");
 		}
 	}
 }
@@ -176,10 +174,10 @@ void UpdateInfo(ACCOUNT &login)
 					gotoxy(20, 22); printf("Ngay thang khong hop le. Vui long nhap lai\n");
 				}
 			} while (check != 0);
-			// đi đến vị trí info để ghi
+			// đi đến vị trí để ghi info
 			fseek(fAcc, ftell(fAcc) - sizeof(ACCOUNT), 0);
 			fwrite(&login, sizeof(ACCOUNT), 1, fAcc);
-			fclose(fAcc);	 // quan trọng: không được để ngoài vòng if
+			fclose(fAcc); // quan trọng: ko dc bỏ ngoài vòng if
 		}
 	}
 }
@@ -259,7 +257,7 @@ void InputInfo(ACCOUNT &acc)
 		}
 	} while (check != 0);
 }
-//kiểm tra tài khoản đã tồn tại, return true neu co ton tai
+//kiểm tra username tài khoản đã tồn tại, return true nếu có tồn tại
 bool ExistAcc(FILE *f, ACCOUNT acc)
 {
 	rewind(f);
@@ -303,8 +301,8 @@ void CreateAcc()
 					check = true;
 					fseek(fAcc, 0, SEEK_END);
 					fwrite(&acc, sizeof(ACCOUNT), 1, fAcc);
-					gotoxy(16, 26); printf("Them tai khoan thanh cong.    ");
 					fclose(fAcc);
+					gotoxy(16, 26); printf("Them tai khoan thanh cong.    ");
 				}
 				else
 				{
@@ -322,7 +320,10 @@ void CreateAcc()
 						}
 					} while (choice != 1 && choice != 2);
 					if (choice == 1)
+					{
+						fclose(fAcc);
 						break;
+					}
 					system("cls");
 				}
 			} while (check == false);
@@ -343,8 +344,8 @@ void CreateAcc()
 					check = true;
 					fseek(fAcc, 0, SEEK_END);
 					fwrite(&acc, sizeof(ACCOUNT), 1, fAcc);
-					gotoxy(16, 26); printf("Them tai khoan thanh cong.    ");
 					fclose(fAcc);
+					gotoxy(16, 26); printf("Them tai khoan thanh cong.    ");
 				}
 				else
 				{
@@ -362,7 +363,10 @@ void CreateAcc()
 						}
 					} while (choice != 1 && choice != 2);
 					if (choice == 1)
+					{
+						fclose(fAcc);
 						break;
+					}
 					system("cls");
 				}
 			} while (check == false);
@@ -633,13 +637,12 @@ void PhanQuyen()
 			} while (temp.Status != 1 && temp.Status != 2);
 			fseek(f, ftell(f) - sizeof(ACCOUNT), 0);
 			fwrite(&temp, sizeof(ACCOUNT), 1, f);
-			fclose(f);
-		}
-		else
-		{
-			gotoxy(20, 8); printf("Khong tim thay tai khoan   ");
+			fclose(f); // quan trọng: không được để ngoài vòng if
+			return;
 		}
 	}
+	fclose(f);
+	gotoxy(20, 8); printf("Khong tim thay tai khoan   ");
 }
 // xem tài khoản
 void ViewAcc()
@@ -657,7 +660,7 @@ void ViewAcc()
 	rewind(fAcc);
 	int j = 7;
 	ACCOUNT temp;
-	while (fread(&temp, sizeof(ACCOUNT), 1, fAcc))
+	while (fread(&temp, sizeof(ACCOUNT), 1, fAcc) == 1)
 	{
 		gotoxy(2, j); printf("%s", temp.Username);
 		gotoxy(15, j); printf("%s", temp.Password);
@@ -689,7 +692,8 @@ void ViewAcc()
 	gotoxy(2, j + 4); printf("So tai khoan: %d             ", tong);
 	fclose(fAcc);
 }
-// thêm sách
+
+// nhập thông tin 1 cuốn sách
 void InputBook(BOOK &book)
 {
 	while (getchar() != '\n');
@@ -705,47 +709,50 @@ void InputBook(BOOK &book)
 	gotoxy(20, 14); printf("The loai: ");
 	fgets(book.Categories, sizeof(book.Categories), stdin);
 	gotoxy(20, 16); printf("Gia (VND): ");
-	fgets(book.Price, sizeof(book.Price), stdin);
+	scanf("%d", &book.Price);
 	gotoxy(20, 18); printf("So luong: ");
 	scanf("%d", &book.Quantity);
-	book.Borrow = 0;
+	gotoxy(20, 20); printf("So sach chua duoc tra (nhap 0 neu day la sach moi): ");
+	scanf("%d", &book.Borrow);
 	int check = 0;
 	do {
-		gotoxy(20, 20); printf("Ngay xuat ban: ");
+		gotoxy(20, 22); printf("Ngay xuat ban: ");
 		scanf("%d", &book.Issued.Day);
-		gotoxy(20, 22); printf("Thang xuat ban: ");
+		gotoxy(20, 24); printf("Thang xuat ban: ");
 		scanf("%d", &book.Issued.Month);
-		gotoxy(20, 24); printf("Nam xuat ban: ");
+		gotoxy(20, 26); printf("Nam xuat ban: ");
 		scanf("%d", &book.Issued.Year);
 		check = CheckDate(book.Issued);
 		if (check != 0)
 		{
-			gotoxy(20, 26); printf("Ngay thang khong hop le. Vui long nhap lai\n");
+			gotoxy(20, 28); printf("Ngay thang khong hop le. Vui long nhap lai\n");
 		}
 	} while (check != 0);
 }
+// kiểm tra ISBN sách đã tồn tại chưa, return true nếu có tồn tại
 bool ExistBook(FILE *f, BOOK book)
 {
 	rewind(f);
 	BOOK temp;
 	while (fread(&temp, sizeof(BOOK), 1, f))
 	{
-		if (strcmp(temp.Name, book.Name) == 0)
+		if (strcmp(temp.ISBN, book.ISBN) == 0)
 			return true;
 	}
 	return false;
 }
+// thêm sách
 void AddBook()
 {
-	FILE *fBook = fopen("Book.bin", "ab+");
-	if (fBook == NULL)
-	{
-		printf("Khong mo duoc file");
-	}
 	BOOK book;
 	int choice;
 	bool check = false;
 	do {
+		FILE *fBook = fopen("Book.bin", "ab+");
+		if (fBook == NULL)
+		{
+			printf("Khong mo duoc file");
+		}
 		system("cls");
 		gotoxy(10, 4); printf(":::::::::::::::::::::: Them Sach ::::::::::::::::::::::");
 		InputBook(book);
@@ -754,26 +761,31 @@ void AddBook()
 			check = true;
 			fseek(fBook, 0, SEEK_END);
 			fwrite(&book, sizeof(BOOK), 1, fBook);
-			gotoxy(16, 26); printf("Them sach thanh cong.    ");
+			gotoxy(16, 28); printf("Them sach thanh cong.    ");
 			fclose(fBook);
 		}
 		else
 		{
-			gotoxy(16, 26); printf("Sach da ton tai.");
+			system("cls");
+			gotoxy(10, 4); printf(":::::::::::::::::::::: Them Sach ::::::::::::::::::::::");
+			gotoxy(16, 10); printf("Sach da ton tai.");
 			int choice;
 			do {
-				gotoxy(16, 28); printf("Thoat ra menu?");
-				gotoxy(20, 30); printf("1. Co");
-				gotoxy(20, 32); printf("2. Khong, nhap lai.");
-				gotoxy(16, 34); printf("Lua chon cua ban: ");
+				gotoxy(16, 12); printf("Thoat ra menu?");
+				gotoxy(20, 14); printf("1. Co");
+				gotoxy(20, 16); printf("2. Khong, nhap lai.");
+				gotoxy(16, 18); printf("Lua chon cua ban: ");
 				scanf("%d", &choice);
 				if (choice != 1 && choice != 2)
 				{
-					gotoxy(16, 36); printf("Vui long chi nhap 1 hoac 2");
+					gotoxy(16, 20); printf("Vui long chi nhap 1 hoac 2");
 				}
 			} while (choice != 1 && choice != 2);
 			if (choice == 1)
+			{
+				fclose(fBook);
 				break;
+			}
 			system("cls");
 		}
 	} while (check == false);
@@ -783,9 +795,9 @@ void ViewBook()
 {
 	system("cls");
 	gotoxy(1, 1);
-	printf("::::::::::::::::::::::::::::::: So luong Sach :::::::::::::::::::::::::::::::::");
-	gotoxy(2, 5);
-	printf("ISBN       TEN SACH                TEN TAC GIA        NHA XUAT BAN          NAM    THE LOAI      DON GIA(VND)     SO LUONG");
+	printf("::::::::::::::::::::::::::::::: Danh sach Sach :::::::::::::::::::::::::::::::::");
+	gotoxy(2, 5);                                               
+	printf("ISBN       TEN SACH                 TEN TAC GIA         NHA XUAT BAN       NAM    THE LOAI      DON GIA(VND)     SO LUONG");
 	FILE *fBook = fopen("Book.bin", "rb");
 	if (fBook == NULL)
 	{
@@ -794,6 +806,7 @@ void ViewBook()
 	rewind(fBook);
 	int j = 7;
 	int tong = 0;
+	int tongreal = 0;
 	BOOK temp;
 	while (fread(&temp, sizeof(BOOK), 1, fBook))
 	{
@@ -803,15 +816,17 @@ void ViewBook()
 		gotoxy(56, j); printf("NXB %s", temp.Publisher);
 		gotoxy(78, j); printf("%d", temp.Issued.Year);
 		gotoxy(85, j); printf("%s", temp.Categories);
-		gotoxy(99, j); printf("%s", temp.Price);
-		gotoxy(116, j); printf("%d", temp.Quantity);
+		gotoxy(99, j); printf("%d", temp.Price);
+		gotoxy(116, j); printf("%d          ", temp.Quantity - temp.Borrow);
 		j++;
 		tong = tong + temp.Quantity;
+		tongreal = tongreal + temp.Quantity - temp.Borrow;
 	}
-	gotoxy(2, j + 4); printf("So luong sach: %d cuon             ", tong);
+	gotoxy(2, j + 4); printf("So luong sach nhap ve: %d cuon             ", tong);
+	gotoxy(2, j + 6); printf("So luong sach hien tai: %d cuon             ", tongreal);
 	fclose(fBook);
 }
-// Chỉnh sửa thông tin 1 quyển sách
+// Chỉnh sửa thông tin 1 quyển sách // BUG
 void UpdateBook()
 {
 	while (getchar() != '\n');
@@ -846,7 +861,7 @@ void UpdateBook()
 			gotoxy(20, 16); printf("The loai moi: ");
 			fgets(book.Categories, sizeof(book.Categories), stdin);
 			gotoxy(20, 18); printf("Gia moi (VND): ");
-			fgets(book.Price, sizeof(book.Price), stdin);
+			scanf("%d", &book.Price);
 			gotoxy(20, 20); printf("So luong moi: ");
 			scanf("%d", &book.Quantity);
 			book.Borrow = 0;
@@ -868,13 +883,13 @@ void UpdateBook()
 			fseek(fBook, ftell(fBook) - sizeof(BOOK), 0);
 			fwrite(&book, sizeof(BOOK), 1, fBook);
 			gotoxy(20, 28); printf("Cap nhat sach thanh cong            \n");
-			fclose(fBook);	 // quan trọng: không được để ngoài vòng if
 		}
 		else
 		{
 			gotoxy(20, 8); printf("Khong tim thay sach            ");
 		}
 	}
+	fclose(fBook);
 }
 // xuất thông tin 1 quyển sách
 void OutputBook(BOOK book)
@@ -884,8 +899,8 @@ void OutputBook(BOOK book)
 	gotoxy(20, 12); printf("Tac gia: %s", book.Author);
 	gotoxy(20, 14); printf("Nha xuat ban: %s", book.Publisher);
 	gotoxy(20, 16); printf("The loai: %s", book.Categories);
-	gotoxy(20, 18); printf("Gia: %s VND", book.Price);
-	gotoxy(20, 20); printf("So luong: %d\n", book.Quantity);
+	gotoxy(20, 18); printf("Gia (VND): %d", book.Price);
+	gotoxy(20, 20); printf("So luong: %d\n", book.Quantity - book.Borrow);
 	gotoxy(20, 22); printf("Ngay xuat ban: %d/%d/%d      ", book.Issued.Day, book.Issued.Month, book.Issued.Year);
 }
 //Tìm kiếm sách theo ISBN
@@ -911,10 +926,10 @@ void SearchBookISBN()
 		{
 			// in ra info
 			OutputBook(temp);
-			fclose(fBook);	 // quan trọng: không được để ngoài vòng if
 			check = true;
 		}
 	}
+	fclose(fBook);
 	if (check == false)
 	{
 		gotoxy(20, 8); printf("Khong tim thay sach      ");
@@ -943,10 +958,10 @@ void SearchBookName()
 		{
 			// in ra info
 			OutputBook(temp);
-			fclose(fBook);	 // quan trọng: không được để ngoài vòng if
 			check = true;
 		}
 	}
+	fclose(fBook);
 	if (check == false)
 	{
 		gotoxy(20, 8); printf("Khong tim thay sach      ");
@@ -968,7 +983,7 @@ void DeleteBook()
 	}
 	rewind(fBook);
 	BOOK temp;
-	bool check = false; // để in ra nếu ko tìm thấy sách
+	bool check = false; // để ko cần phải remove + rename lúc đang đọc (mâu thuẫn)
 	while (fread(&temp, sizeof(BOOK), 1, fBook))
 	{
 		if (strcmp(ISBNtemp, temp.ISBN) == 0)
@@ -976,7 +991,7 @@ void DeleteBook()
 			check = true;
 			FILE* ft = fopen("Temp.bin", "wb+");  // tạo Temp.bin để ghi sách k bị delete
 			rewind(fBook);
-			while (fread(&temp, sizeof(BOOK), 1, fBook) == 1)
+			while (fread(&temp, sizeof(BOOK), 1, fBook))
 			{
 				if (strcmp(temp.ISBN, ISBNtemp) != 0)
 				{
@@ -985,20 +1000,20 @@ void DeleteBook()
 				}
 			}
 			fclose(ft);
-			fclose(fBook);
-			remove("Book.bin");
-			rename("Temp.bin", "Book.bin");			// xóa Book.bin cũ, đổi Temp.bin thành Book.bin mới
 			gotoxy(20, 8); printf("Xoa sach thanh cong     ");
 		}
 	}
-	if (check == false)
+	fclose(fBook);
+	if (check == true)
+	{
+		remove("Book.bin");
+		rename("Temp.bin", "Book.bin"); // xóa Book.bin cũ, đổi Temp.bin thành Book.bin mới
+	}
+	else if (check == false)
 	{
 		gotoxy(20, 8); printf("Khong tim thay sach      ");
 	}
 }
-
-
-
 // menu quản lý sách
 void MenuSach(ACCOUNT login)
 {
@@ -1143,9 +1158,1100 @@ void MenuSach(ACCOUNT login)
 	} while (luachon != 8);
 }
 
+// thêm độc giả
+void InputReader(READER &reader)
+{
+	while (getchar() != '\n');
+	flushall();
+	gotoxy(20, 6); printf("Ma doc gia: ");
+	fgets(reader.ID, sizeof(reader.ID), stdin);
+	gotoxy(20, 8); printf("Ho va ten: ");
+	fgets(reader.FullName, sizeof(reader.FullName), stdin);
+	gotoxy(20, 10); printf("CMND: ");
+	fgets(reader.CMND, sizeof(reader.CMND), stdin);
+	do {
+		gotoxy(20, 12); printf("Gioi tinh (1 la Nam, 2 la Nu): ");
+		scanf("%d", &reader.Genre);
+		if (reader.Genre != 1 || reader.Genre != 2)
+		{
+			gotoxy(20, 14); printf("Vui long chi nhap so 1 hoac 2!");
+		}
+	} while (reader.Genre != 1 && reader.Genre != 2);
+	while (getchar() != '\n');
+	flushall();
+	gotoxy(20, 14); printf("                              ");
+	gotoxy(20, 14); printf("Email: ");
+	fgets(reader.Email, sizeof(reader.Email), stdin);
+	gotoxy(20, 16); printf("Dia chi: ");
+	fgets(reader.Address, sizeof(reader.Address), stdin);
+	int check = 0;
+	do {
+		gotoxy(20, 18); printf("Ngay sinh: ");
+		scanf("%d", &reader.BirthDate.Day);
+		gotoxy(20, 20); printf("Thang sinh: ");
+		scanf("%d", &reader.BirthDate.Month);
+		gotoxy(20, 22); printf("Nam sinh: ");
+		scanf("%d", &reader.BirthDate.Year);
+		check = CheckDate(reader.BirthDate);
+		if (check != 0)
+		{
+			gotoxy(20, 24); printf("Ngay thang khong hop le. Vui long nhap lai\n");
+		}
+	} while (check != 0);
+	gotoxy(20, 24); printf("                                            ");
+	check = 0;
+	do {
+		gotoxy(20, 24); printf("Ngay lap the: ");
+		scanf("%d", &reader.BornCard.Day);
+		gotoxy(20, 26); printf("Thang lap the: ");
+		scanf("%d", &reader.BornCard.Month);
+		gotoxy(20, 28); printf("Nam lap the: ");
+		scanf("%d", &reader.BornCard.Year);
+		check = CheckDate(reader.BornCard);
+		if (check != 0)
+		{
+			gotoxy(20, 30); printf("Ngay thang khong hop le. Vui long nhap lai\n");
+		}
+	} while (check != 0);
+	reader.EndCard.Day = reader.BornCard.Day;
+	reader.EndCard.Month = reader.BornCard.Month;
+	reader.EndCard.Year = reader.BornCard.Year + 4;
+}
+bool ExistReader(FILE *f, READER reader)
+{
+	rewind(f);
+	READER temp;
+	while (fread(&temp, sizeof(READER), 1, f))
+	{
+		if (strcmp(temp.ID, reader.ID) == 0)
+			return true;
+	}
+	return false;
+}
+void AddReader()
+{
+	READER reader;
+	int choice;
+	bool check = false;
+	do {
+		FILE *fReader = fopen("Reader.bin", "ab+");
+		if (fReader == NULL)
+		{
+			printf("Khong mo duoc file");
+		}
+		system("cls");
+		gotoxy(10, 4); printf(":::::::::::::::::::::: Them Doc Gia ::::::::::::::::::::::");
+		InputReader(reader);
+		if (ExistReader(fReader, reader) == false)
+		{
+			check = true;
+			fseek(fReader, 0, SEEK_END);
+			fwrite(&reader, sizeof(READER), 1, fReader);
+			gotoxy(16, 30); printf("Them doc gia thanh cong.    ");
+			fclose(fReader);
+		}
+		else
+		{
+			fclose(fReader);
+			system("cls");
+			gotoxy(10, 4); printf(":::::::::::::::::::::: Them Doc Gia ::::::::::::::::::::::");
+			gotoxy(16, 10); printf("Doc gia da ton tai.");
+			int choice;
+			do {
+				gotoxy(16, 12); printf("Thoat ra menu?");
+				gotoxy(20, 14); printf("1. Co");
+				gotoxy(20, 16); printf("2. Khong, nhap lai.");
+				gotoxy(16, 18); printf("Lua chon cua ban: ");
+				scanf("%d", &choice);
+				if (choice != 1 && choice != 2)
+				{
+					gotoxy(16, 20); printf("Vui long chi nhap 1 hoac 2");
+				}
+			} while (choice != 1 && choice != 2);
+			if (choice == 1)
+				break;
+			system("cls");
+		}
+	} while (check == false);
+}
+// xem độc giả
+void ViewReader()
+{
+	system("cls");
+	gotoxy(1, 1);
+	printf("::::::::::::::::::::::::::::::: Danh sach Doc Gia :::::::::::::::::::::::::::::::::");
+	gotoxy(2, 5);
+	printf("ID       HO VA TEN            CMND       PHAI EMAIL                   DIA CHI                           NGAY SINH  HET HAN");
+	FILE *fReader = fopen("Reader.bin", "rb");
+	if (fReader == NULL)
+	{
+		printf("Khong mo duoc file");
+	}
+	rewind(fReader);
+	int j = 7;
+	int tong = 0;
+	READER temp;
+	while (fread(&temp, sizeof(READER), 1, fReader))
+	{
+		gotoxy(2, j); printf("%s", temp.ID);
+		gotoxy(11, j); printf("%s", temp.FullName);
+		gotoxy(32, j); printf("%s", temp.CMND);
+		if (temp.Genre == 1)
+		{
+			gotoxy(43, j); printf("Nam");
+		}
+		else if (temp.Genre == 2)
+		{
+			gotoxy(43, j); printf("Nu");
+		}
+		gotoxy(48, j); printf("%s", temp.Email);
+		gotoxy(72, j); printf("%s", temp.Address);
+		gotoxy(106, j); printf("%d/%d/%d", temp.BirthDate.Day, temp.BirthDate.Month, temp.BirthDate.Year);
+		gotoxy(117, j); printf("%d/%d/%d         ", temp.EndCard.Day, temp.EndCard.Month, temp.EndCard.Year);
+		j++;
+		tong++;
+	}
+	gotoxy(2, j + 4); printf("So luong doc gia: %d nguoi             ", tong);
+	fclose(fReader);
+}
+// Chỉnh sửa thông tin 1 độc giả
+void UpdateReader()
+{
+	while (getchar() != '\n');
+	flushall();
+	char IDtemp[MAX_PASS];
+	gotoxy(10, 4); printf("::::::::::::::::::::Cap nhat thong tin Doc Gia::::::::::::::::::::");
+	gotoxy(20, 6); printf("Nhap ID: ");
+	fgets(IDtemp, sizeof(IDtemp), stdin);
+	FILE *fReader = fopen("Reader.bin", "rb+");
+	if (fReader == NULL)
+	{
+		printf("Khong mo duoc file");
+	}
+	rewind(fReader);
+	READER temp;
+	while (fread(&temp, sizeof(READER), 1, fReader))
+	{
+		if (strcmp(IDtemp, temp.ID) == 0)
+		{
+			// nhập info mới
+			READER reader;
+			//while (getchar() != '\n');
+			//flushall();
+			gotoxy(20, 8); printf("Ma doc gia moi: ");
+			fgets(reader.ID, sizeof(reader.ID), stdin);
+			gotoxy(20, 10); printf("Ho va ten moi: ");
+			fgets(reader.FullName, sizeof(reader.FullName), stdin);
+			gotoxy(20, 12); printf("CMND moi: ");
+			fgets(reader.CMND, sizeof(reader.CMND), stdin);
+			do {
+				gotoxy(20, 14); printf("Gioi tinh moi (1 la Nam, 2 la Nu): ");
+				scanf("%d", &reader.Genre);
+				if (reader.Genre != 1 || reader.Genre != 2)
+				{
+					gotoxy(20, 16); printf("Vui long chi nhap so 1 hoac 2!");
+				}
+			} while (reader.Genre != 1 && reader.Genre != 2);
+			while (getchar() != '\n');
+			flushall();
+			gotoxy(20, 16); printf("                              ");
+			gotoxy(20, 16); printf("Email moi: ");
+			fgets(reader.Email, sizeof(reader.Email), stdin);
+			gotoxy(20, 18); printf("Dia chi moi: ");
+			fgets(reader.Address, sizeof(reader.Address), stdin);
+			int check = 0;
+			do {
+				gotoxy(20, 20); printf("Ngay sinh moi: ");
+				scanf("%d", &reader.BirthDate.Day);
+				gotoxy(20, 22); printf("Thang sinh moi: ");
+				scanf("%d", &reader.BirthDate.Month);
+				gotoxy(20, 24); printf("Nam sinh moi: ");
+				scanf("%d", &reader.BirthDate.Year);
+				check = CheckDate(reader.BirthDate);
+				if (check != 0)
+				{
+					gotoxy(20, 26); printf("Ngay thang khong hop le. Vui long nhap lai\n");
+				}
+			} while (check != 0);
+			gotoxy(20, 26); printf("                                            ");
+			check = 0;
+			do {
+				gotoxy(20, 26); printf("Ngay lap moi: ");
+				scanf("%d", &reader.BornCard.Day);
+				gotoxy(20, 28); printf("Thang lap moi: ");
+				scanf("%d", &reader.BornCard.Month);
+				gotoxy(20, 30); printf("Nam lap moi: ");
+				scanf("%d", &reader.BornCard.Year);
+				check = CheckDate(reader.BornCard);
+				if (check != 0)
+				{
+					gotoxy(20, 32); printf("Ngay thang khong hop le. Vui long nhap lai\n");
+				}
+			} while (check != 0);
+			reader.EndCard.Day = reader.BornCard.Day;
+			reader.EndCard.Month = reader.BornCard.Month;
+			reader.EndCard.Year = reader.BornCard.Year + 4;
+			// đi đến vị trí info để ghi
+			fseek(fReader, ftell(fReader) - sizeof(READER), 0);
+			fwrite(&reader, sizeof(READER), 1, fReader);
+			gotoxy(20, 32); printf("Cap nhat doc gia thanh cong            \n");
+		}
+		else
+		{
+			gotoxy(20, 8); printf("Khong tim thay doc gia            ");
+		}
+	}
+	fclose(fReader);
+}
+// xuất thông tin 1 độc giả
+void OutputReader(READER reader)
+{
+	gotoxy(20, 8); printf("-----------------------------------------------");
+	gotoxy(20, 10); printf("Ho va ten: %s", reader.FullName);
+	gotoxy(20, 12); printf("CMND: %s", reader.CMND);
+	if (reader.Genre == 1)
+	{
+		gotoxy(20, 14); printf("Gioi tinh: Nam");
+	}
+	else if (reader.Genre == 2)
+	{
+		gotoxy(20, 14); printf("Gioi tinh: Nu");
+	}
+	gotoxy(20, 16); printf("Email: %s", reader.Email);
+	gotoxy(20, 18); printf("Dia chi: %s", reader.Address);
+	gotoxy(20, 20); printf("Ngay sinh: %d/%d/%d", reader.BirthDate.Day, reader.BirthDate.Month, reader.BirthDate.Year);
+	gotoxy(20, 22); printf("Ngay lap the: %d/%d/%d", reader.BornCard.Day, reader.BornCard.Month, reader.BornCard.Year);
+	gotoxy(20, 24); printf("Ngay het han the: %d/%d/%d                 ", reader.EndCard.Day, reader.EndCard.Month, reader.EndCard.Year);
+}
+//Tìm kiếm độc giả theo CMND
+void SearchReaderCMND()
+{
+	while (getchar() != '\n');
+	flushall();
+	char CMNDtemp[MAX_PASS];
+	gotoxy(10, 4); printf(":::::::::::::::::::Tim kiem Doc Gia theo CMND:::::::::::::::::::");
+	gotoxy(20, 6); printf("Nhap CMND: ");
+	fgets(CMNDtemp, sizeof(CMNDtemp), stdin);
+	FILE *fReader = fopen("Reader.bin", "rb");
+	if (fReader == NULL)
+	{
+		printf("Khong mo duoc file");
+	}
+	rewind(fReader);
+	READER temp;
+	bool check = false; // để in ra ko tìm thấy sách
+	while (fread(&temp, sizeof(READER), 1, fReader))
+	{
+		if (strcmp(CMNDtemp, temp.CMND) == 0)
+		{
+			// in ra info
+			OutputReader(temp);
+			check = true;
+		}
+	}
+	fclose(fReader);
+	if (check == false)
+	{
+		gotoxy(20, 8); printf("Khong tim thay doc gia       ");
+	}
+}
+//Tìm kiếm độc giả theo họ tên
+void SearchReaderName()
+{
+	while (getchar() != '\n');
+	flushall();
+	char FullNametemp[MAX_NAME];
+	gotoxy(10, 4); printf("::::::::::::::::::::Tim kiem Doc Gia theo Ten::::::::::::::::::::");
+	gotoxy(20, 6); printf("Nhap ten: ");
+	fgets(FullNametemp, sizeof(FullNametemp), stdin);
+	FILE *fReader = fopen("Reader.bin", "rb");
+	if (fReader == NULL)
+	{
+		printf("Khong mo duoc file");
+	}
+	rewind(fReader);
+	READER temp;
+	bool check = false; // để in ra nếu ko tìm thấy độc giả
+	while (fread(&temp, sizeof(READER), 1, fReader))
+	{
+		if (strcmp(FullNametemp, temp.FullName) == 0)
+		{
+			// in ra info
+			OutputReader(temp);
+			check = true;
+		}
+	}
+	fclose(fReader);
+	if (check == false)
+	{
+		fclose(fReader);
+		gotoxy(20, 8); printf("Khong tim thay doc gia       ");
+	}
+}
+//Xóa thông tin độc giả theo ID
+void DeleteReader()
+{
+	while (getchar() != '\n');
+	flushall();
+	char IDtemp[MAX_PASS];
+	gotoxy(10, 4); printf("::::::::::::::::::::::Xoa Doc Gia::::::::::::::::::::::");
+	gotoxy(20, 6); printf("Nhap ID: ");
+	fgets(IDtemp, sizeof(IDtemp), stdin);
+	FILE *fReader = fopen("Reader.bin", "rb");
+	if (fReader == NULL)
+	{
+		printf("Khong mo duoc file");
+	}
+	rewind(fReader);
+	READER temp;
+	bool check = false; // để ko cần phải remove + rename lúc đang đọc (mâu thuẫn)
+	while (fread(&temp, sizeof(READER), 1, fReader))
+	{
+		if (strcmp(IDtemp, temp.ID) == 0)
+		{
+			check = true;
+			FILE* ft = fopen("Temp.bin", "wb+");  // tạo temp.bin để ghi độc giả k bị delete
+			rewind(fReader);
+			while (fread(&temp, sizeof(READER), 1, fReader) == 1)
+			{
+				if (strcmp(temp.ID, IDtemp) != 0)
+				{
+					fseek(ft, 0, SEEK_CUR);
+					fwrite(&temp, sizeof(READER), 1, ft); // ghi hết sách vào temp.bin trừ độc giả muốn delete
+				}
+			}
+			fclose(ft);
+			gotoxy(20, 8); printf("Xoa doc gia thanh cong     ");
+		}
+	}
+	fclose(fReader);
+	if (check == true)
+	{
+		remove("Reader.bin");
+		rename("Temp.bin", "Reader.bin"); // xóa Reader.bin cũ, đổi temp.bin thành Reader.bin mới
+	}
+	else if (check == false)
+	{
+		gotoxy(20, 8); printf("Khong tim thay doc gia      ");
+	}
+}
+// menu quản lý độc giả
+void MenuDocGia(ACCOUNT login)
+{
+	int luachon;
+	do {
+		system("cls");
+		gotoxy(20, 3); printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2 QUAN LY DOC GIA \xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
+		gotoxy(20, 4); printf("\xB2"); gotoxy(66, 4); printf("\xB2");
+		gotoxy(20, 5); printf("\xB2"); gotoxy(66, 5); printf("\xB2");
+		gotoxy(20, 6); printf("\xB2"); gotoxy(66, 6); printf("\xB2");
+		gotoxy(20, 7); printf("\xB2"); gotoxy(66, 7); printf("\xB2");
+		gotoxy(20, 8); printf("\xB2"); gotoxy(66, 8); printf("\xB2");
+		gotoxy(20, 9); printf("\xB2"); gotoxy(66, 9); printf("\xB2");
+		gotoxy(20, 10); printf("\xB2"); gotoxy(66, 10); printf("\xB2");
+		gotoxy(20, 11); printf("\xB2"); gotoxy(66, 11); printf("\xB2");
+		gotoxy(20, 12); printf("\xB2"); gotoxy(66, 12); printf("\xB2");
+		gotoxy(20, 13); printf("\xB2"); gotoxy(66, 13); printf("\xB2");
+		gotoxy(20, 14); printf("\xB2"); gotoxy(66, 14); printf("\xB2");
+		gotoxy(20, 15); printf("\xB2"); gotoxy(66, 15); printf("\xB2");
+		gotoxy(20, 16); printf("\xB2"); gotoxy(66, 16); printf("\xB2");
+		gotoxy(20, 17); printf("\xB2"); gotoxy(66, 17); printf("\xB2");
+		gotoxy(20, 18); printf("\xB2"); gotoxy(66, 18); printf("\xB2");
+		gotoxy(20, 19); printf("\xB2"); gotoxy(66, 19); printf("\xB2");
+		gotoxy(20, 20); printf("\xB2"); gotoxy(66, 20); printf("\xB2");
+		gotoxy(20, 21); printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
+		gotoxy(21, 5); printf("\t 1. Danh sach doc gia trong thu vien");
+		gotoxy(21, 7); printf("\t 2. Them doc gia");
+		gotoxy(21, 9); printf("\t 3. Cap nhat thong tin doc gia");
+		gotoxy(21, 11); printf("\t 4. Xoa doc gia");
+		gotoxy(21, 13); printf("\t 5. Tim doc gia theo CMND");
+		gotoxy(21, 15); printf("\t 6. Tim doc gia theo ten");
+		gotoxy(21, 17); printf("\t 7. Quay ve menu chinh");
+		gotoxy(21, 19); printf("\t 8. Thoat chuong trinh");
+		gotoxy(20, 23); printf("Lua chon cua ban:");
+		scanf("%d", &luachon);
+		switch (luachon)
+		{
+		case 1:
+		{
+			system("cls");
+			ViewReader();
+			system("pause");
+			break;
+		}
+		case 2:
+		{
+			system("cls");
+			AddReader();
+			system("pause");
+			break;
+		}
+		case 3:
+		{
+
+			system("cls");
+			UpdateReader();
+			system("pause");
+			break;
+		}
+		case 4:
+		{
+			if (login.Permission == 1 || login.Permission == 3)
+			{
+				system("cls");
+				DeleteReader();
+			}
+			else
+			{
+				gotoxy(20, 27); printf("Ban khong co quyen su dung chuc nang nay            ");
+			}
+			system("pause");
+			break;
+		}
+		case 5:
+		{
+			system("cls");
+			SearchReaderCMND();
+			system("pause");
+			break;
+		}
+		case 6:
+		{
+			system("cls");
+			SearchReaderName();
+			system("pause");
+			break;
+		}
+		case 7:
+		{
+			if (login.Permission == 1)
+			{
+				MenuAdmin(login);
+			}
+			else if (login.Permission == 2)
+			{
+				MenuChuyenVien(login);
+			}
+			else if (login.Permission == 3)
+			{
+				MenuQuanLy(login);
+			}
+			break;
+		}
+		case 8:
+		{
+			system("cls");
+			gotoxy(20, 11); printf("Thoat trong 3 giay nua");
+			for (int j = 0; j < 60; j++)
+			{
+				Sleep(50);
+				printf(".");
+			}
+			system("cls");
+			exit(0);
+		}
+		default:
+		{
+			gotoxy(20, 25); printf("\aLua chon khong hop le. Vui long chon lai!      ");
+			system("pause");
+		}
+		}
+	} while (luachon != 8);
+}
+
+// kiểm tra ID độc giả tồn tại trong Reader.bin ko
+bool ExistIDReader(char ID[MAX_PASS])
+{
+	FILE *f = fopen("Reader.bin", "rb");
+	rewind(f);
+	READER temp;
+	while (fread(&temp, sizeof(READER), 1, f))
+	{
+		if (strcmp(temp.ID, ID) == 0)
+		{
+			fclose(f);
+			return true;
+		}
+	}
+	fclose(f);
+	return false;
+}
+// kiểm tra ISBN sách tồn tại trong Book.bin ko
+bool ExistISBNBook(char ISBN[MAX_PASS])
+{
+	FILE *f = fopen("Book.bin", "rb");
+	rewind(f);
+	BOOK temp;
+	while (fread(&temp, sizeof(BOOK), 1, f))
+	{
+		if (strcmp(temp.ISBN, ISBN) == 0)
+		{
+			fclose(f);
+			return true;
+		}
+	}
+	fclose(f);
+	return false;
+}
+// thêm 7 ngày -> ngày trả
+void Add7Day(DATES &Return)
+{
+	if (Return.Month == 1 || Return.Month == 3 || Return.Month == 5 || Return.Month == 7 || Return.Month == 8 || Return.Month == 10 || Return.Month == 12)
+	{
+		if (Return.Day <= 24)
+		{
+			Return.Day = Return.Day + 7;
+		}
+		else if (Return.Month == 12)
+		{
+			Return.Year++;
+			Return.Month = 1;
+			Return.Day = 7 - (31 - Return.Day);
+		}
+		else
+		{
+			Return.Month++;
+			Return.Day = 7 - (31 - Return.Day);
+		}
+	}
+	else if (Return.Month == 2)
+	{
+		if (Return.Year % 4 == 0)
+		{
+			if (Return.Day <= 22)
+			{
+				Return.Day = Return.Day + 7;
+			}
+			else
+			{
+				Return.Month++;
+				Return.Day = 7 - (29 - Return.Day);
+			}
+		}
+		else
+		{
+			if (Return.Day <= 21)
+			{
+				Return.Day = Return.Day + 7;
+			}
+			else
+			{
+				Return.Month++;
+				Return.Day = 7 - (28 - Return.Day);
+			}
+		}
+	}
+	else
+	{
+		if (Return.Day <= 23)
+		{
+			Return.Day = Return.Day + 7;
+		}
+		else
+		{
+			Return.Month++;
+			Return.Day = 7 - (30 - Return.Day);
+		}
+	}
+}
+// tăng borrow của sách theo ISBN + check nếu borrow>quantity 
+bool IncreaseBorrow(char ISBN[MAX_PASS])
+{
+	FILE *f = fopen("Book.bin", "rb+");
+	BOOK temp;
+	rewind(f);
+	while (fread(&temp, sizeof(BOOK), 1, f))
+	{
+		if (strcmp(temp.ISBN, ISBN) == 0)
+		{
+			temp.Borrow++;
+			if (temp.Borrow > temp.Quantity)
+			{
+				fclose(f);
+				return false;
+			}
+			fseek(f, ftell(f) - sizeof(BOOK), 0);
+			fwrite(&temp, sizeof(BOOK), 1, f);
+			fclose(f);
+			return true;
+		}
+	}
+}
+// xuất ra phiếu mượn sách
+void OutputPhieuMuonSach(PMS &Phieu)
+{
+	system("cls");
+	gotoxy(36, 1); printf("*****************************************");
+	gotoxy(36, 2); printf("|             PHIEU MUON SACH           |");
+	gotoxy(36, 3); printf("*****************************************");
+	gotoxy(36, 4); printf("|                                       |");
+	gotoxy(36, 5); printf("|                                       |");
+	gotoxy(36, 6); printf("|                                       |");
+	gotoxy(36, 7); printf("|                                       |");
+	gotoxy(36, 8); printf("|                                       |");
+	gotoxy(36, 9); printf("|                                       |");
+	gotoxy(36, 10); printf("|                                       |");
+	gotoxy(36, 11); printf("|                                       |");
+	gotoxy(36, 12); printf("|                                       |");
+	gotoxy(36, 13); printf("|                                       |");
+	gotoxy(36, 14); printf("|                                       |");
+	gotoxy(36, 15); printf("|                                       |");
+	gotoxy(36, 16); printf("|                                       |");
+	gotoxy(36, 17); printf("|                                       |");
+	gotoxy(36, 18); printf("|                                       |");
+	gotoxy(36, 19); printf("|                                       |");
+	gotoxy(36, 20); printf("*****************************************");
+	gotoxy(40, 5); printf("Ma doc gia: ");
+	puts(Phieu.ID);
+	gotoxy(40, 7); printf("Thoi gian muon: %d/%d/%d", Phieu.Borrow.Day, Phieu.Borrow.Month, Phieu.Borrow.Year);
+	gotoxy(40, 9); printf("Thoi gian tra du kien : %d/%d/%d", Phieu.Return.Day, Phieu.Return.Month, Phieu.Return.Year);
+	gotoxy(40, 11); printf("Danh sach ISBN cac sach duoc muon");
+	switch (Phieu.SL)
+	{
+	case 1:
+		gotoxy(40, 13); printf("ISBN 1: ");
+		puts(Phieu.ISBN1);
+		break;
+	case 2:
+		gotoxy(40, 13); printf("ISBN 1: ");
+		puts(Phieu.ISBN1);
+		gotoxy(40, 15); printf("ISBN 2: ");
+		puts(Phieu.ISBN2);
+		break;
+	case 3:
+		gotoxy(40, 13); printf("ISBN 1: ");
+		puts(Phieu.ISBN1);
+		gotoxy(40, 15); printf("ISBN 2: ");
+		puts(Phieu.ISBN2);
+		gotoxy(40, 17); printf("ISBN 3: ");
+		puts(Phieu.ISBN3);
+		break;
+	}
+}
+// nhập và ghi phiếu mượn sách
+void InputPhieuMuonSach()
+{
+	system("cls");
+	gotoxy(10, 4); printf(":::::::::::::::::::::Lap Phieu Muon Sach:::::::::::::::::::::");
+	PMS Phieu;
+	do {
+		while (getchar() != '\n');
+		flushall();
+		gotoxy(20, 6); printf("Ma doc gia: ");
+		fgets(Phieu.ID, sizeof(Phieu.ID), stdin);
+		if (ExistIDReader(Phieu.ID) == false)
+		{
+			gotoxy(20, 8); printf("Doc gia khong ton tai. Vui long nhap lai");
+		}
+	} while (ExistIDReader(Phieu.ID) == false);
+	int check = 0;
+	do {
+		gotoxy(20, 8); printf("                                        ");
+		gotoxy(20, 8); printf("Ngay muon: ");
+		scanf("%d", &Phieu.Borrow.Day);
+		gotoxy(20, 10); printf("Thang muon: ");
+		scanf("%d", &Phieu.Borrow.Month);
+		gotoxy(20, 12); printf("Nam muon: ");
+		scanf("%d", &Phieu.Borrow.Year);
+		check = CheckDate(Phieu.Borrow);
+		if (check != 0)
+		{
+			gotoxy(20, 14); printf("Ngay thang khong hop le. Vui long nhap lai\n");
+
+		}
+	} while (check != 0);
+	Phieu.Return = Phieu.Borrow;
+	Add7Day(Phieu.Return);
+	// nhập các ISBN 
+	do
+	{
+		gotoxy(20, 14); printf("                                            ");
+		gotoxy(20, 14); printf("Nhap so luong sach muon muon (toi da 3): ");
+		scanf("%d", &Phieu.SL);
+		if (Phieu.SL < 1 && Phieu.SL > 3)
+		{
+			gotoxy(20, 16); printf("Chi duoc muon toi da 3 quyen. Vui long nhap lai");
+		}
+	} while (Phieu.SL < 1 && Phieu.SL > 3);
+	switch (Phieu.SL)
+	{
+	case 1: // 1 ISBN
+	{
+		bool checkborrow = true; // để ko phải gọi IncreaseBorrow 2 lần (borrow sẽ bị tăng 2 lần)
+		do {
+			while (getchar() != '\n');
+			flushall();
+			gotoxy(20, 16); printf("                                               ");
+			gotoxy(20, 16); printf("ISBN 1: ");
+			fgets(Phieu.ISBN1, sizeof(Phieu.ISBN1), stdin);
+			if (ExistISBNBook(Phieu.ISBN1) == false)
+			{
+				gotoxy(20, 18); printf("Sach khong ton tai. Vui long nhap lai.");
+			}
+			else if (IncreaseBorrow(Phieu.ISBN1) == false)
+			{
+				checkborrow = false; // để ko phải gọi IncreaseBorrow 2 lần
+				gotoxy(20, 18); printf("Khong con sach de muon. Vui long nhap lai.");
+			}
+			else
+				checkborrow = true;
+		} while (ExistISBNBook(Phieu.ISBN1) == false || checkborrow == false);
+		break;
+	}
+	case 2: // 2 ISBN
+	{
+		bool checkborrow = true;
+		do {
+			while (getchar() != '\n');
+			flushall();
+			gotoxy(20, 16); printf("                                               ");
+			gotoxy(20, 16); printf("ISBN 1: ");
+			fgets(Phieu.ISBN1, sizeof(Phieu.ISBN1), stdin);
+			if (ExistISBNBook(Phieu.ISBN1) == false)
+			{
+				gotoxy(20, 18); printf("Sach khong ton tai. Vui long nhap lai.");
+			}
+			else if (IncreaseBorrow(Phieu.ISBN1) == false)
+			{
+				checkborrow = false; // để ko phải gọi IncreaseBorrow 2 lần
+				gotoxy(20, 18); printf("Khong con sach de muon. Vui long nhap lai.");
+			}
+			else
+				checkborrow = true;
+		} while (ExistISBNBook(Phieu.ISBN1) == false || checkborrow == false);
+		checkborrow = true;
+		do {
+			gotoxy(20, 18); printf("                                               ");
+			gotoxy(20, 18); printf("ISBN 2: ");
+			fgets(Phieu.ISBN2, sizeof(Phieu.ISBN2), stdin);
+			if (ExistISBNBook(Phieu.ISBN2) == false)
+			{
+				gotoxy(20, 20); printf("Sach khong ton tai. Vui long nhap lai.");
+			}
+			else if (IncreaseBorrow(Phieu.ISBN2) == false)
+			{
+				checkborrow = false; // để ko phải gọi IncreaseBorrow 2 lần
+				gotoxy(20, 20); printf("Khong con sach de muon. Vui long nhap lai.");
+			}
+			else
+				checkborrow = true;
+		} while (ExistISBNBook(Phieu.ISBN2) == false || checkborrow == false);
+		break;
+	}
+	case 3: // 3 ISBN
+	{
+		bool checkborrow = true;
+		do {
+			while (getchar() != '\n');
+			flushall();
+			gotoxy(20, 16); printf("                                               ");
+			gotoxy(20, 16); printf("ISBN 1: ");
+			fgets(Phieu.ISBN1, sizeof(Phieu.ISBN1), stdin);
+			if (ExistISBNBook(Phieu.ISBN1) == false)
+			{
+				gotoxy(20, 18); printf("Sach khong ton tai. Vui long nhap lai.");
+			}
+			else if (IncreaseBorrow(Phieu.ISBN1) == false)
+			{
+				checkborrow = false; // để ko phải gọi IncreaseBorrow 2 lần
+				gotoxy(20, 18); printf("Khong con sach de muon. Vui long nhap lai.");
+			}
+			else
+				checkborrow = true;
+		} while (ExistISBNBook(Phieu.ISBN1) == false || checkborrow == false);
+		checkborrow = true;
+		do {
+			gotoxy(20, 18); printf("                                               ");
+			gotoxy(20, 18); printf("ISBN 2: ");
+			fgets(Phieu.ISBN2, sizeof(Phieu.ISBN2), stdin);
+			if (ExistISBNBook(Phieu.ISBN2) == false)
+			{
+				gotoxy(20, 20); printf("Sach khong ton tai. Vui long nhap lai.");
+			}
+			else if (IncreaseBorrow(Phieu.ISBN2) == false)
+			{
+				checkborrow = false; // để ko phải gọi IncreaseBorrow 2 lần
+				gotoxy(20, 20); printf("Khong con sach de muon. Vui long nhap lai.");
+			}
+			else
+				checkborrow = true;
+		} while (ExistISBNBook(Phieu.ISBN2) == false || checkborrow == false);
+		checkborrow = true;
+		do {
+			gotoxy(20, 20); printf("                                               ");
+			gotoxy(20, 20); printf("ISBN 3: ");
+			fgets(Phieu.ISBN3, sizeof(Phieu.ISBN3), stdin);
+			if (ExistISBNBook(Phieu.ISBN3) == false)
+			{
+				gotoxy(20, 22); printf("Sach khong ton tai. Vui long nhap lai.");
+			}
+			else if (IncreaseBorrow(Phieu.ISBN3) == false)
+			{
+				checkborrow = false; // để ko phải gọi IncreaseBorrow 2 lần
+				gotoxy(20, 22); printf("Khong con sach de muon. Vui long nhap lai.");
+			}
+			else
+				checkborrow = true;
+		} while (ExistISBNBook(Phieu.ISBN3) == false || checkborrow == false);
+		break;
+	}
+	}
+	// ghi file
+	FILE *fMuon = fopen("PhieuMuon.bin", "ab");
+	rewind(fMuon);
+	if (fMuon == NULL)
+	{
+		printf("Mo file khong thanh cong");
+	}
+	fwrite(&Phieu, sizeof(PMS), 1, fMuon);
+	gotoxy(20, 22); printf("Ghi phieu muon sach thanh cong         ");
+	fclose(fMuon);
+	OutputPhieuMuonSach(Phieu);
+}
+
+// PHIẾU TRẢ SÁCH ĐANG BUG T.T
+// số ngày trễ hạn
+int DayLate(PTS Phieu)
+{
+	int DayLate = 0;
+	if (Phieu.Return.Year < Phieu.ReturnReal.Year)
+	{
+		Phieu.ReturnReal.Year = Phieu.ReturnReal.Year + 12;
+	}
+	DayLate = (Phieu.ReturnReal.Month - Phieu.Return.Month) * 2 * 30 - Phieu.Return.Day - (30 - Phieu.ReturnReal.Day);
+	return DayLate;
+}
+// tìm giá của sách
+int SearchPrice(char ISBN[MAX_PASS])
+{
+	FILE *fBook = fopen("Book.bin", "rb+");
+	if (fBook == NULL)
+	{
+		printf("Khong mo duoc file");
+	}
+	BOOK temp;
+	while (fread(&temp, sizeof(BOOK), 1, fBook))
+	{
+		if (strcmp(ISBN, temp.ISBN) == 0)
+		{
+			fclose(fBook);
+			return temp.Price;
+		}
+	}
+}
+// tiền trễ hạn
+int Bill(PTS &Phieu)
+{
+	Phieu.Bill = (DayLate(Phieu) * 5000) + SearchPrice(Phieu.ISBN1) + SearchPrice(Phieu.ISBN2) + SearchPrice(Phieu.ISBN3);
+	return Phieu.Bill;
+}
+// kiểm tra ID độc giả tồn tại trong PhieuMuon.bin ko rồi copy ra PTS
+bool ExistIDBorrow(char ID[MAX_PASS], PTS &Phieu)
+{
+	FILE *f = fopen("PhieuMuon.bin", "rb");
+	rewind(f);
+	PMS temp;
+	while (fread(&temp, sizeof(PMS), 1, f))
+	{
+		if (strcmp(temp.ID, ID) == 0)
+		{
+			Phieu.Borrow = temp.Borrow;
+			Phieu.Return = temp.Return;
+			strcpy(Phieu.ISBN1, temp.ISBN1);
+			strcpy(Phieu.ISBN2, temp.ISBN1);
+			strcpy(Phieu.ISBN3, temp.ISBN1);
+			Phieu.SL = temp.SL;
+			fclose(f);
+			return true;
+		}
+	}
+	fclose(f);
+	return false;
+}
+void OutputPhieuTraSach(PTS Phieu)
+{
+	system("cls");
+	gotoxy(36, 1); printf("*****************************************");
+	gotoxy(36, 2); printf("|              PHIEU TRA SACH           |");
+	gotoxy(36, 3); printf("*****************************************");
+	gotoxy(36, 4); printf("|                                       |");
+	gotoxy(36, 5); printf("|                                       |");
+	gotoxy(36, 6); printf("|                                       |");
+	gotoxy(36, 7); printf("|                                       |");
+	gotoxy(36, 8); printf("|                                       |");
+	gotoxy(36, 9); printf("|                                       |");
+	gotoxy(36, 10); printf("|                                       |");
+	gotoxy(36, 11); printf("|                                       |");
+	gotoxy(36, 12); printf("|                                       |");
+	gotoxy(36, 13); printf("|                                       |");
+	gotoxy(36, 14); printf("|                                       |");
+	gotoxy(36, 15); printf("|                                       |");
+	gotoxy(36, 16); printf("|                                       |");
+	gotoxy(36, 17); printf("|                                       |");
+	gotoxy(36, 18); printf("|                                       |");
+	gotoxy(36, 19); printf("|                                       |");
+	gotoxy(36, 20); printf("|                                       |");
+	gotoxy(36, 21); printf("|                                       |");
+	gotoxy(36, 22); printf("|                                       |");
+	gotoxy(36, 23); printf("|                                       |");
+	gotoxy(36, 24); printf("|                                       |");
+	gotoxy(36, 25); printf("|                                       |");
+	gotoxy(36, 26); printf("|                                       |");
+	gotoxy(36, 27); printf("|                                       |");
+	gotoxy(36, 28); printf("|                                       |");
+	gotoxy(36, 29); printf("|                                       |");
+	gotoxy(36, 30); printf("|                                       |");
+	gotoxy(36, 31); printf("|                                       |");
+	gotoxy(36, 32); printf("|                                       |");
+	gotoxy(36, 33); printf("*****************************************");
+	gotoxy(40, 5); printf("Ma doc gia: ");
+	puts(Phieu.ID);
+	gotoxy(40, 7); printf("Thoi gian muon: %d/%d/%d", Phieu.Borrow.Day, Phieu.Borrow.Month, Phieu.Borrow.Year);
+	gotoxy(40, 9); printf("Thoi gian tra du kien: %d/%d/%d", Phieu.Return.Day, Phieu.Return.Month, Phieu.Return.Year);
+	gotoxy(40, 11); printf("Thoi gian tra thuc te: %d/%d/%d", Phieu.ReturnReal.Day, Phieu.ReturnReal.Month, Phieu.ReturnReal.Year);
+	gotoxy(40, 13); printf("Danh sach ISBN cac sach duoc muon");
+	switch (Phieu.SL)
+	{
+	case 1:
+	{
+		gotoxy(40, 15); printf("ISBN 1: ");
+		puts(Phieu.ISBN1);
+		break;
+	}
+	case 2:
+	{
+		gotoxy(40, 15); printf("ISBN 1: ");
+		puts(Phieu.ISBN1);
+		gotoxy(40, 17); printf("ISBN 2: ");
+		puts(Phieu.ISBN2);
+		break;
+	}
+	case 3:
+	{
+		gotoxy(40, 15); printf("ISBN 1: ");
+		puts(Phieu.ISBN1);
+		gotoxy(40, 17); printf("ISBN 2: ");
+		puts(Phieu.ISBN2);
+		gotoxy(40, 19); printf("ISBN 3: ");
+		puts(Phieu.ISBN3);
+		break;
+	}
+	}
+	if (Phieu.SLMat != 0)
+	{
+		gotoxy(40, 21); printf("Danh sach ISBN cac sach mat");
+		switch (Phieu.SL)
+		{
+		case 1:
+		{
+			gotoxy(40, 23); printf("ISBN mat 1: ");
+			puts(Phieu.Lost1);
+			break;
+		}
+		case 2:
+		{
+			gotoxy(40, 23); printf("ISBN mat 1: ");
+			puts(Phieu.Lost1);
+			gotoxy(40, 25); printf("ISBN mat 2: ");
+			puts(Phieu.Lost2);
+			break;
+		}
+		case 3:
+		{
+			gotoxy(40, 23); printf("ISBN mat 1: ");
+			puts(Phieu.Lost1);
+			gotoxy(40, 25); printf("ISBN mat 2: ");
+			puts(Phieu.Lost2);
+			gotoxy(40, 27); printf("ISBN mat 3: ");
+			puts(Phieu.Lost3);
+			break;
+		}
+		}
+	}
+	gotoxy(40, 29); printf("Tien phai thanh toan: % dong", Phieu.Bill);
+}
+void InputPhieuTraSach()
+{
+	system("cls");
+	gotoxy(10, 4); printf(":::::::::::::::::::::Lap Phieu Tra Sach:::::::::::::::::::::");
+	PTS Phieu;
+	do {
+		while (getchar() != '\n');
+		flushall();
+		gotoxy(20, 6); printf("Ma doc gia: ");
+		fgets(Phieu.ID, sizeof(Phieu.ID), stdin);
+		if (ExistIDBorrow(Phieu.ID, Phieu) == false)
+		{
+			gotoxy(20, 8); printf("Doc gia nay chua muon sach. Vui long nhap lai");
+		}
+	} while (ExistIDBorrow(Phieu.ID, Phieu) == false);
+	gotoxy(20, 8); printf("                                        ");
+	int check = 0;
+	do
+	{
+		gotoxy(20, 8); printf("Ngay tra thuc te: ");
+		scanf("%d", &Phieu.ReturnReal.Day);
+		gotoxy(20, 10); printf("Thang tra thuc te: ");
+		scanf("%d", &Phieu.ReturnReal.Month);
+		gotoxy(20, 12); printf("Nam tra thuc te: ");
+		scanf("%d", &Phieu.ReturnReal.Year);
+		check = CheckDate(Phieu.ReturnReal);
+	} while (check != 0);
+	gotoxy(20, 14); printf("So sach mat: ");
+	scanf("%d", &Phieu.SLMat);
+	switch (Phieu.SLMat)
+	{
+	case 1: // mất 1 cuốn
+	{
+		while (getchar() != '\n');
+		flushall();
+		gotoxy(20, 16); printf("ISBN sach mat 1: ");
+		fgets(Phieu.Lost1, sizeof(Phieu.Lost1), stdin);
+		Phieu.SL--;
+		break;
+	}
+	case 2: // mất 2 cuốn
+	{
+		while (getchar() != '\n');
+		flushall();
+		gotoxy(20, 16); printf("ISBN sach mat 1: ");
+		fgets(Phieu.Lost1, sizeof(Phieu.Lost1), stdin);
+		gotoxy(20, 18); printf("ISBN sach mat 2: ");
+		fgets(Phieu.Lost2, sizeof(Phieu.Lost2), stdin);
+		Phieu.SL = Phieu.SL - 2;
+		break;
+	}
+	case 3: // mất 3 cuốn
+	{
+		while (getchar() != '\n');
+		flushall();
+		printf("ISBN sach mat 1: ");
+		fgets(Phieu.Lost1, sizeof(Phieu.Lost1), stdin);
+		printf("ISBN sach mat 2: ");
+		fgets(Phieu.Lost2, sizeof(Phieu.Lost2), stdin);
+		printf("ISBN sach mat 3: ");
+		fgets(Phieu.Lost3, sizeof(Phieu.Lost3), stdin);
+		Phieu.SL = Phieu.SL - 3;
+		break;
+	}
+	}
+	Bill(Phieu);
+	// ghi file
+	FILE *fTra = fopen("PhieuTra.bin", "ab");
+	rewind(fTra);
+	if (fTra == NULL)
+	{
+		printf("Mo file khong thanh cong");
+	}
+	fwrite(&Phieu, sizeof(PTS), 1, fTra);
+	gotoxy(20, 22); printf("Ghi phieu tra sach thanh cong         ");
+	fclose(fTra);
+	OutputPhieuTraSach(Phieu);
+}
 
 
-// số lượng loại sách
+
+// thống kê loại sách
 void KhoiTaoName(LIST_NAME &l)
 {
 	l.pHead = l.pTail = NULL;
@@ -1238,8 +2344,133 @@ void ViewBookCategory()
 	gotoxy(2, j + 4); printf("Co %d the loai         ", tong);
 	fclose(fBook);
 }
-
-
+// thống kê số lượng sách đang được mượn
+void ViewBorrow()
+{
+	system("cls");
+	gotoxy(1, 1);
+	printf("::::::::::::::::::::::::::::::: Danh sach Sach Dang Muon :::::::::::::::::::::::::::::::::");
+	gotoxy(2, 5);
+	printf("ISBN       TEN SACH                TEN TAC GIA        NHA XUAT BAN         NAM   THE LOAI      DON GIA(VND)     SL DANG MUON");
+	FILE *fBook = fopen("Book.bin", "rb");
+	if (fBook == NULL)
+	{
+		printf("Khong mo duoc file");
+	}
+	rewind(fBook);
+	int j = 7;
+	int tongmuon = 0;
+	BOOK temp;
+	while (fread(&temp, sizeof(BOOK), 1, fBook))
+	{
+		if (temp.Borrow != 0)
+		{
+			gotoxy(2, j); printf("%s", temp.ISBN);
+			gotoxy(13, j); printf("%s", temp.Name);
+			gotoxy(37, j); printf("%s", temp.Author);
+			gotoxy(56, j); printf("NXB %s", temp.Publisher);
+			gotoxy(78, j); printf("%d", temp.Issued.Year);
+			gotoxy(85, j); printf("%s", temp.Categories);
+			gotoxy(99, j); printf("%d", temp.Price);
+			gotoxy(116, j); printf("%d          ", temp.Borrow);
+			j++;
+			tongmuon = tongmuon + temp.Borrow;
+		}
+	}
+	gotoxy(2, j + 4); printf("So luong sach dang duoc muon: %d cuon             ", tongmuon);
+	fclose(fBook);
+}
+// thống kê độc giả theo giới tính
+void ViewReaderGenre()
+{
+	system("cls");
+	gotoxy(1, 1);
+	printf("::::::::::::::::::::::::::::::: Danh sach Doc Gia Nam :::::::::::::::::::::::::::::::::");
+	gotoxy(2, 5);
+	printf("ID       HO VA TEN            CMND       PHAI EMAIL                   DIA CHI                           NGAY SINH  HET HAN");
+	FILE *fReader = fopen("Reader.bin", "rb");
+	if (fReader == NULL)
+	{
+		printf("Khong mo duoc file");
+	}
+	rewind(fReader);
+	int j = 7;
+	int tongnam = 0;
+	int tongnu = 0;
+	READER temp;
+	while (fread(&temp, sizeof(READER), 1, fReader))
+	{
+		if (temp.Genre == 1)
+		{
+			gotoxy(2, j); printf("%s", temp.ID);
+			gotoxy(11, j); printf("%s", temp.FullName);
+			gotoxy(32, j); printf("%s", temp.CMND);
+			gotoxy(43, j); printf("Nam");
+			gotoxy(48, j); printf("%s", temp.Email);
+			gotoxy(72, j); printf("%s", temp.Address);
+			gotoxy(106, j); printf("%d/%d/%d", temp.BirthDate.Day, temp.BirthDate.Month, temp.BirthDate.Year);
+			gotoxy(117, j); printf("%d/%d/%d         ", temp.EndCard.Day, temp.EndCard.Month, temp.EndCard.Year);
+			j++;
+			tongnam++;
+		}
+	}
+	j += 4;
+	gotoxy(2, j); printf("So luong doc gia nam: %d nguoi             ", tongnam);
+	j += 2;
+	gotoxy(1, j);
+	printf("::::::::::::::::::::::::::::::: Danh sach Doc Gia Nu :::::::::::::::::::::::::::::::::");
+	j += 2; gotoxy(2, j);
+	printf("ID       HO VA TEN            CMND       PHAI EMAIL                   DIA CHI                           NGAY SINH  HET HAN");
+	rewind(fReader);
+	j += 2;
+	while (fread(&temp, sizeof(READER), 1, fReader))
+	{
+		if (temp.Genre == 2)
+		{
+			gotoxy(2, j); printf("%s", temp.ID);
+			gotoxy(11, j); printf("%s", temp.FullName);
+			gotoxy(32, j); printf("%s", temp.CMND);
+			gotoxy(43, j); printf("Nu");
+			gotoxy(48, j); printf("%s", temp.Email);
+			gotoxy(72, j); printf("%s", temp.Address);
+			gotoxy(106, j); printf("%d/%d/%d", temp.BirthDate.Day, temp.BirthDate.Month, temp.BirthDate.Year);
+			gotoxy(117, j); printf("%d/%d/%d         ", temp.EndCard.Day, temp.EndCard.Month, temp.EndCard.Year);
+			j++;
+			tongnu++;
+		}
+	}
+	gotoxy(2, j + 4); printf("So luong doc gia nu: %d nguoi             ", tongnu);
+	fclose(fReader);
+}
+// thống kê đôc giả trễ hạn
+void ViewTreHanReader()
+{
+	system("cls");
+	gotoxy(1, 1);
+	printf("::::::::::::::::::::::::::::::: Danh sach Doc Gia Tre Han :::::::::::::::::::::::::::::::::");
+	gotoxy(2, 5);
+	printf("ID");
+	FILE *fReader = fopen("PhieuTra.bin", "rb");
+	if (fReader == NULL)
+	{
+		printf("Khong mo duoc file");
+	}
+	rewind(fReader);
+	int j = 7;
+	int tong = 0;
+	PTS temp;
+	while (fread(&temp, sizeof(PTS), 1, fReader))
+	{
+		if (temp.Bill != 0)
+		{
+			gotoxy(2, j); printf("%s", temp.ID);
+			j++;
+			tong++;
+		}
+	}
+	j += 4;
+	gotoxy(2, j); printf("So luong doc gia tre han: %d nguoi             ", tong);
+}
 // menu thống kê
 void MenuThongKe(ACCOUNT login)
 {
@@ -1273,7 +2504,7 @@ void MenuThongKe(ACCOUNT login)
 		gotoxy(21, 11); printf("\t 4. So luong doc gia theo gioi tinh");
 		gotoxy(21, 13); printf("\t 5. So sach dang duoc muon");
 		gotoxy(21, 15); printf("\t 6. Doc gia bi tre han");
-		gotoxy(21, 17); printf("\t 7. Danh sach tai khoan (Admin)");
+		gotoxy(21, 17); printf("\t 7. Danh sach tai khoan");
 		gotoxy(21, 19); printf("\t 8. Quay ve menu chinh");
 		gotoxy(21, 21); printf("\t 9. Thoat chuong trinh");
 		gotoxy(20, 25); printf("Lua chon cua ban:");
@@ -1285,6 +2516,7 @@ void MenuThongKe(ACCOUNT login)
 			if (login.Permission == 1 || login.Permission == 3)
 			{
 				system("cls");
+				ViewBook();
 			}
 			else
 			{
@@ -1312,7 +2544,7 @@ void MenuThongKe(ACCOUNT login)
 			if (login.Permission == 1 || login.Permission == 3)
 			{
 				system("cls");
-
+				ViewReader();
 			}
 			else
 			{
@@ -1326,7 +2558,7 @@ void MenuThongKe(ACCOUNT login)
 			if (login.Permission == 1 || login.Permission == 3)
 			{
 				system("cls");
-
+				ViewReaderGenre();
 			}
 			else
 			{
@@ -1338,12 +2570,14 @@ void MenuThongKe(ACCOUNT login)
 		case 5:
 		{
 			system("cls");
+			ViewBorrow();
 			system("pause");
 			break;
 		}
 		case 6:
 		{
 			system("cls");
+			ViewTreHanReader();
 			system("pause");
 			break;
 		}
@@ -1455,48 +2689,48 @@ void MenuAdmin(ACCOUNT &login)
 		case 2:
 		{
 			system("cls");
-			//char passtemp[MAX_PASS];
-			//do {
-			//	// nhập pass 
-			//	gotoxy(20, 8); printf("Nhap lai Password: ");
-			//	// mã hóa mật khẩu
-			//	gotoxy(39, 8);
-			//	int p = 0;
-			//	do {
-			//		passtemp[p] = _getch();
-			//		if (passtemp[p] != '\r')
-			//		{
-			//			printf("*");
-			//		}
-			//		p++;
-			//	} while (passtemp[p - 1] != '\r');
-			//	passtemp[p - 1] = '\0';
-			//	if (strcmp(passtemp, login.Password) == 0)
-			//	{
-			//		system("cls");
-			//		RePass(login);
-			//	}
-			//	else if (strcmp(passtemp, login.Password) != 0)
-			//	{
-			//		gotoxy(20, 10); printf("Ban da nhap sai Password");
-			//		int choice;
-			//		do {
-			//			gotoxy(20, 12); printf("Thoat ra menu?");
-			//			gotoxy(23, 14); printf("1. Co");
-			//			gotoxy(23, 16); printf("2. Khong, nhap lai.");
-			//			gotoxy(20, 18); printf("Lua chon cua ban: ");
-			//			scanf("%d", &choice);
-			//			if (choice != 1 && choice != 2)
-			//				gotoxy(20, 20); printf("Vui long chi nhap 1 hoac 2 ");
-			//		} while (choice != 1 && choice != 2);
-			//		if (choice == 1)
-			//			break;
-			//		system("cls");
-			//	}
-			//} while (strcmp(passtemp, login.Password) != 0);
-			system("cls");
-			RePass(login);
-
+			char passtemp[MAX_PASS];
+			bool check = false;
+			do {
+				// nhập pass 
+				gotoxy(20, 8); printf("Nhap lai Password: ");
+				// mã hóa mật khẩu
+				gotoxy(39, 8);
+				int p = 0;
+				do {
+					passtemp[p] = _getch();
+					if (passtemp[p] != '\r')
+					{
+						printf("*");
+					}
+					p++;
+				} while (passtemp[p - 1] != '\r');
+				passtemp[p - 1] = '\0';
+				if (strcmp(passtemp, login.Password) == 0)
+				{
+					check = true;
+					system("cls");
+					RePass(login);
+					system("pause");
+				}
+				else
+				{
+					gotoxy(20, 10); printf("Ban da nhap sai Password");
+					int choice;
+					do {
+						gotoxy(20, 12); printf("Thoat ra menu?");
+						gotoxy(23, 14); printf("1. Co");
+						gotoxy(23, 16); printf("2. Khong, nhap lai.");
+						gotoxy(20, 18); printf("Lua chon cua ban: ");
+						scanf("%d", &choice);
+						if (choice != 1 && choice != 2)
+							gotoxy(20, 20); printf("Vui long chi nhap 1 hoac 2 ");
+					} while (choice != 1 && choice != 2);
+					if (choice == 1)
+						break;
+					system("cls");
+				}
+			} while (check == false);
 			break;
 		}
 		case 3:
@@ -1525,21 +2759,32 @@ void MenuAdmin(ACCOUNT &login)
 			system("pause");
 			break;
 		}
-		//case 6:
-		//	system("cls");
-		//	break;
+		case 6:
+		{
+			system("cls");
+			MenuDocGia(login);
+			break;
+		}
 		case 7:
 		{
 			system("cls");
 			MenuSach(login);
 			break;
 		}
-		//case 8:
-		//	system("cls");
-		//	break;
-		//case 9:
-		//	system("cls");
-		//	break;
+		case 8:
+		{
+			system("cls");
+			InputPhieuMuonSach();
+			system("pause");
+			break;
+		}
+		case 9:
+		{
+			system("cls");
+			InputPhieuTraSach();
+			system("pause");
+			break;
+		}
 		case 10:
 		{
 			system("cls");
@@ -1616,8 +2861,8 @@ void MenuChuyenVien(ACCOUNT &login)
 		case 2:
 		{
 			system("cls");
-			char passtemp[MAX_PASS];
 			bool check = false;
+			char passtemp[MAX_PASS];
 			do {
 				// nhập pass 
 				gotoxy(20, 8); printf("Nhap lai Password: ");
@@ -1638,8 +2883,9 @@ void MenuChuyenVien(ACCOUNT &login)
 					check = true;
 					system("cls");
 					RePass(login);
+					system("pause");
 				}
-				else 
+				else
 				{
 					gotoxy(20, 10); printf("Ban da nhap sai Password");
 					int choice;
@@ -1656,7 +2902,7 @@ void MenuChuyenVien(ACCOUNT &login)
 						break;
 					system("cls");
 				}
-			} while (check==false);
+			} while (check == false);
 			break;
 		}
 		case 3:
@@ -1672,10 +2918,30 @@ void MenuChuyenVien(ACCOUNT &login)
 			UpdateInfo(login);
 			break;
 		}
+		case 4:
+		{
+			system("cls");
+			MenuDocGia(login);
+			break;
+		}
 		case 5:
 		{
 			system("cls");
 			MenuSach(login);
+			break;
+		}
+		case 6:
+		{
+			system("cls");
+			InputPhieuMuonSach();
+			system("pause");
+			break;
+		}
+		case 7:
+		{
+			system("cls");
+			InputPhieuTraSach();
+			system("pause");
 			break;
 		}
 		case 8:
@@ -1753,6 +3019,7 @@ void MenuQuanLy(ACCOUNT &login)
 		case 2:
 		{
 			system("cls");
+			bool check = false;
 			char passtemp[MAX_PASS];
 			do {
 				// nhập pass 
@@ -1771,10 +3038,12 @@ void MenuQuanLy(ACCOUNT &login)
 				passtemp[p - 1] = '\0';
 				if (strcmp(passtemp, login.Password) == 0)
 				{
+					check = true;
 					system("cls");
 					RePass(login);
+					system("pause");
 				}
-				else if (strcmp(passtemp, login.Password) != 0)
+				else
 				{
 					gotoxy(20, 10); printf("Ban da nhap sai Password");
 					int choice;
@@ -1791,7 +3060,7 @@ void MenuQuanLy(ACCOUNT &login)
 						break;
 					system("cls");
 				}
-			} while (strcmp(passtemp, login.Password) != 0);
+			} while (check == false);
 			break;
 		}
 		case 3:
@@ -1807,10 +3076,30 @@ void MenuQuanLy(ACCOUNT &login)
 			UpdateInfo(login);
 			break;
 		}
+		case 4:
+		{
+			system("cls");
+			MenuDocGia(login);
+			break;
+		}
 		case 5:
 		{
 			system("cls");
 			MenuSach(login);
+			break;
+		}
+		case 6:
+		{
+			system("cls");
+			InputPhieuMuonSach();
+			system("pause");
+			break;
+		}
+		case 7:
+		{
+			system("cls");
+			InputPhieuTraSach();
+			system("pause");
 			break;
 		}
 		case 8:
